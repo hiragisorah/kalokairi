@@ -49,15 +49,15 @@ namespace Seed
 
 		// Factory
 	public:
-		static std::unique_ptr<Buffer> IndexBuffer(const Microsoft::WRL::ComPtr<ID3D11DeviceContext> & device_context, const IndexCollection & indices);
-		static std::unique_ptr<Buffer> VertexBuffer(const Microsoft::WRL::ComPtr<ID3D11DeviceContext> & device_context, const VertexCollection & vertices);
+		static std::unique_ptr<Buffer> IndexBuffer(const DeviceContext & device_context, const IndexCollection & indices);
+		static std::unique_ptr<Buffer> VertexBuffer(const DeviceContext & device_context, const VertexCollection & vertices);
 	
 		// Setup
 	public:
 		void Setup(void) const;
 
 	private:
-		Buffer(const Microsoft::WRL::ComPtr<ID3D11DeviceContext> & device_context) noexcept(false);
+		Buffer(const DeviceContext & device_context) noexcept(false);
 
 		// Private implementation.
 		class Impl;

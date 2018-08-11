@@ -25,6 +25,7 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="render-target.h" />
     <ClInclude Include="resource-pool.h" />
+    <ClInclude Include="shader.h" />
     <ClInclude Include="view-port.h" />
   </ItemGroup>
   <ItemGroup>
@@ -33,6 +34,7 @@
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="render-target.cpp" />
+    <ClCompile Include="shader.cpp" />
     <ClCompile Include="view-port.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

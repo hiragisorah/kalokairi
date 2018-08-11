@@ -40,6 +40,10 @@ namespace Seed
 		const unsigned int CreateDepthStencil(const unsigned int & width, const unsigned int & height);
 		void UnloadDepthStencil(const unsigned int & key);
 
+		// - SHader
+		const unsigned int CreateShader(const std::string & file_name);
+		void UnloadShader(const unsigned int & key);
+
 		// - Geometry
 		const unsigned int CreateBox(const DirectX::XMFLOAT3 & size = { 1, 1, 1 });
 		const unsigned int CreateSphere(const float & diameter = 1, const size_t & tessellation = 16);
@@ -50,6 +54,7 @@ namespace Seed
 		void ClearTarget(const std::vector<unsigned int> & render_targets, const std::vector<unsigned int> & depth_stencil);
 		void SetViewPort(const unsigned int & view_port);
 		void SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil);
+		void SetShader(const unsigned int & shader);
 		void Draw(const unsigned int & key);
 
 	private:

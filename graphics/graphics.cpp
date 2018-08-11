@@ -3,6 +3,7 @@
 #include "depth-stencil.h"
 #include "geometry.h"
 #include "render-target.h"
+#include "shader.h"
 #include "view-port.h"
 
 #include "resource-pool.h"
@@ -34,17 +35,19 @@ public:
 	void set_height(const unsigned int & height);
 
 private:
-	ResourcePool<Geometry> geometry_pool_;
 	ResourcePool<RenderTarget> render_target_pool_;
 	ResourcePool<DepthStencil> depth_stencil_pool_;
 	ResourcePool<ViewPort> view_port_pool_;
+	ResourcePool<Shader> shader_pool_;
+	ResourcePool<Geometry> geometry_pool_;
 
 private:
 	const unsigned int LoadViewPort(std::unique_ptr<ViewPort> && view_port);
-	const unsigned int LoadGeometry(std::unique_ptr<Geometry> && geometry);
 	const unsigned int LoadRenderTarget(std::unique_ptr<RenderTarget> && render_target);
 	const unsigned int LoadDepthStencil(std::unique_ptr<DepthStencil> && depth_stencil);
-	
+	const unsigned int LoadShader(std::unique_ptr<Shader> && shader);
+	const unsigned int LoadGeometry(std::unique_ptr<Geometry> && geometry);
+
 public:
 	const unsigned int CreateViewPort(const unsigned int & width, const unsigned int & height);
 		
@@ -52,17 +55,21 @@ public:
 
 	const unsigned int CreateDepthStencil(const unsigned int & width, const unsigned int & height);
 
+	const unsigned int CreateShader(const std::string & file_name);
+
 	const unsigned int CreateBox(const DirectX::XMFLOAT3 & size);
 	const unsigned int CreateSphere(const float & diameter, const size_t & tessellation);
 
 	void UnloadViewPort(const unsigned int & key);
-	void UnloadGeometry(const unsigned int & key);
 	void UnloadRenderTarget(const unsigned int & key);
 	void UnloadDepthStencil(const unsigned int & key);
+	void UnloadShader(const unsigned int & key);
+	void UnloadGeometry(const unsigned int & key);
 
 	void ClearTarget(const std::vector<unsigned int> & render_targets, const std::vector<unsigned int> & depth_stencil);
 	void SetViewPort(const unsigned int & view_port);
 	void SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil);
+	void SetShader(const unsigned int & shader);
 	void Draw(const unsigned int & key);
 };
 
@@ -94,6 +101,11 @@ void Seed::Graphics::SetViewPort(const unsigned int & view_port)
 void Seed::Graphics::SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil)
 {
 	this->impl_->SetTarget(render_targets, depth_stencil);
+}
+
+void Seed::Graphics::SetShader(const unsigned int & shader)
+{
+	this->impl_->SetShader(shader);
 }
 
 void Seed::Graphics::Draw(const unsigned int & key)
@@ -147,6 +159,16 @@ const unsigned int Seed::Graphics::CreateDepthStencil(const unsigned int & width
 void Seed::Graphics::UnloadDepthStencil(const unsigned int & key)
 {
 	this->impl_->UnloadDepthStencil(key);
+}
+
+const unsigned int Seed::Graphics::CreateShader(const std::string & file_name)
+{
+	return this->impl_->CreateShader(file_name);
+}
+
+void Seed::Graphics::UnloadShader(const unsigned int & key)
+{
+	this->impl_->UnloadShader(key);
 }
 
 const unsigned int Seed::Graphics::CreateViewPort(const unsigned int & width, const unsigned int & height)
@@ -248,6 +270,11 @@ const unsigned int Seed::Graphics::Impl::LoadDepthStencil(std::unique_ptr<DepthS
 	return this->depth_stencil_pool_.Load(depth_stencil);
 }
 
+const unsigned int Seed::Graphics::Impl::LoadShader(std::unique_ptr<Shader>&& shader)
+{
+	return this->shader_pool_.Load(shader);
+}
+
 const unsigned int Seed::Graphics::Impl::CreateViewPort(const unsigned int & width, const unsigned int & height)
 {
 	return this->LoadViewPort(ViewPort::Create(this->device_context_, width, height));
@@ -261,6 +288,11 @@ const unsigned int Seed::Graphics::Impl::CreateBackBuffer(void)
 const unsigned int Seed::Graphics::Impl::CreateDepthStencil(const unsigned int & width, const unsigned int & height)
 {
 	return this->LoadDepthStencil(DepthStencil::Create(this->device_context_, width, height));
+}
+
+const unsigned int Seed::Graphics::Impl::CreateShader(const std::string & file_name)
+{
+	return this->LoadShader(Shader::Create(this->device_context_, file_name));
 }
 
 const unsigned int Seed::Graphics::Impl::CreateBox(const DirectX::XMFLOAT3 & size)
@@ -317,6 +349,11 @@ void Seed::Graphics::Impl::SetTarget(const std::vector<unsigned int>& render_tar
 	ID3D11DepthStencilView * dsv = this->depth_stencil_pool_.Get(depth_stencil)->GetDSV();
 
 	this->device_context_->OMSetRenderTargets(rtvs_.size(), rtvs_.data(), dsv);
+}
+
+void Seed::Graphics::Impl::SetShader(const unsigned int & shader)
+{
+	this->shader_pool_.Get(shader)->Setup();
 }
 
 void Seed::Graphics::Impl::Draw(const unsigned int & key)
