@@ -26,7 +26,7 @@ public:
 	void set_topology(const D3D11_PRIMITIVE_TOPOLOGY & topology);
 
 public:
-	void Initialize(const IndexCollection & indices, const VertexCollection & vertices) const;
+	void Initialize(const IndexCollection & indices, const VertexCollection & vertices);
 
 public:
 	void Draw(void) const;
@@ -36,14 +36,75 @@ Seed::Geometry::~Geometry(void)
 {
 }
 
+void ReverseWinding(Seed::IndexCollection & indices, Seed::VertexCollection & vertices)
+{
+	for (auto it = indices.begin(); it != indices.end(); it += 3)
+	{
+		std::swap(*it, *(it + 2));
+	}
+
+	for (auto it = vertices.begin(); it != vertices.end(); ++it)
+	{
+		it->uv_.x = (1.f - it->uv_.x);
+	}
+}
+
+unsigned int Reverse(unsigned int x, unsigned int y, unsigned int div_x)
+{
+	return x % (div_x + 1) + y * (div_x + 1);
+}
+
+unsigned int v2to1(unsigned int x, unsigned int y, unsigned int div_x)
+{
+	return x % (div_x + 1) + y * (div_x + 1);
+}
+
+std::unique_ptr<Seed::Geometry> Seed::Geometry::Plane(const DeviceContext & device_context, const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size)
+{
+	std::unique_ptr<Geometry> geometry(new Geometry(device_context));
+	
+	IndexCollection indices;
+	VertexCollection vertices;
+
+	vertices.clear();
+	indices.clear();
+
+	float w = size.x / div_x, h = size.y / div_y;
+
+	for (unsigned int n = 0; n < div_y + 1; ++n)
+	{
+		for (unsigned int i = 0; i < div_x + 1; ++i)
+		{
+			vertices.emplace_back(DirectX::XMFLOAT3(-w * div_x * 0.5f + i * w, 0, -h * div_y * 0.5f + n * h), DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT2(0, 0));
+		}
+	}
+
+	for (unsigned int n = 0; n < div_y; ++n)
+	{
+		for (unsigned int i = 0; i < div_x; ++i)
+		{
+			indices.emplace_back(v2to1(i + 0, n + 0, div_x));
+			indices.emplace_back(v2to1(i + 0, n + 0, div_x));
+			indices.emplace_back(v2to1(i + 1, n + 0, div_x));
+			indices.emplace_back(v2to1(i + 0, n + 1, div_x));
+			indices.emplace_back(v2to1(i + 1, n + 1, div_x));
+			indices.emplace_back(v2to1(i + 1, n + 1, div_x));
+		}
+	}
+
+	geometry->impl_->Initialize(indices, vertices);
+
+	geometry->impl_->set_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	return geometry;
+}
+
 std::unique_ptr<Seed::Geometry> Seed::Geometry::Box(const DeviceContext& device_context, const XMFLOAT3 & size)
 {
 	std::unique_ptr<Geometry> geometry(new Geometry(device_context));
 
 	IndexCollection indices;
 	VertexCollection vertices;
-
-	geometry->impl_->Initialize(indices, vertices);
 
 	vertices.clear();
 	indices.clear();
@@ -84,7 +145,7 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Box(const DeviceContext& device_
 		XMVECTOR side2 = XMVector3Cross(normal, side1);
 
 		// Six indices (two triangles) per face.
-		size_t vbase = vertices.size();
+		unsigned int vbase = static_cast<unsigned int>(vertices.size());
 		indices.emplace_back(vbase + 0);
 		indices.emplace_back(vbase + 1);
 		indices.emplace_back(vbase + 2);
@@ -107,12 +168,16 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Box(const DeviceContext& device_
 		vertices.emplace_back(Vertex(XMVectorMultiply(XMVectorSubtract(XMVectorAdd(normal, side1), side2), tsize), normal, textureCoordinates[3]));
 	}
 
+	ReverseWinding(indices, vertices);
+
+	geometry->impl_->Initialize(indices, vertices);
+
 	geometry->impl_->set_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return geometry;
 }
 
-std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& device_context, const float & diameter, const size_t & tessellation)
+std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& device_context, const float & diameter, const unsigned int & tessellation)
 {
 	std::unique_ptr<Geometry> geometry(new Geometry(device_context));
 
@@ -125,13 +190,13 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& devi
 	if (tessellation < 3)
 		throw std::out_of_range("tesselation parameter out of range");
 
-	size_t verticalSegments = tessellation;
-	size_t horizontalSegments = tessellation * 2;
+	unsigned int verticalSegments = tessellation;
+	unsigned int horizontalSegments = tessellation * 2;
 
 	float radius = diameter / 2;
 
 	// Create rings of vertices at progressively higher latitudes.
-	for (size_t i = 0; i <= verticalSegments; i++)
+	for (unsigned int i = 0; i <= verticalSegments; i++)
 	{
 		float v = 1 - float(i) / verticalSegments;
 
@@ -141,7 +206,7 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& devi
 		XMScalarSinCos(&dy, &dxz, latitude);
 
 		// Create a single ring of vertices at this latitude.
-		for (size_t j = 0; j <= horizontalSegments; j++)
+		for (unsigned int j = 0; j <= horizontalSegments; j++)
 		{
 			float u = float(j) / horizontalSegments;
 
@@ -161,14 +226,14 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& devi
 	}
 
 	// Fill the index buffer with triangles joining each pair of latitude rings.
-	size_t stride = horizontalSegments + 1;
+	unsigned int stride = horizontalSegments + 1;
 
-	for (size_t i = 0; i < verticalSegments; i++)
+	for (unsigned int i = 0; i < verticalSegments; i++)
 	{
-		for (size_t j = 0; j <= horizontalSegments; j++)
+		for (unsigned int j = 0; j <= horizontalSegments; j++)
 		{
-			size_t nextI = i + 1;
-			size_t nextJ = (j + 1) % stride;
+			unsigned int nextI = i + 1;
+			unsigned int nextJ = (j + 1) % stride;
 
 			indices.emplace_back(i * stride + j);
 			indices.emplace_back(nextI * stride + j);
@@ -179,6 +244,8 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& devi
 			indices.emplace_back(nextI * stride + nextJ);
 		}
 	}
+
+	ReverseWinding(indices, vertices);
 
 	geometry->impl_->Initialize(indices, vertices);
 
@@ -202,14 +269,16 @@ void Seed::Geometry::Impl::set_topology(const D3D11_PRIMITIVE_TOPOLOGY & topolog
 	this->topology_ = topology;
 }
 
-void Seed::Geometry::Impl::Initialize(const IndexCollection & indices, const VertexCollection & vertices) const
+void Seed::Geometry::Impl::Initialize(const IndexCollection & indices, const VertexCollection & vertices)
 {
-	this->index_buffer_->IndexBuffer(this->device_context_, indices);
-	this->vertex_buffer_->VertexBuffer(this->device_context_, vertices);
+	this->index_buffer_ = Buffer::IndexBuffer(this->device_context_, indices);
+	this->vertex_buffer_ = Buffer::VertexBuffer(this->device_context_, vertices);
 }
 
 void Seed::Geometry::Impl::Draw(void) const
 {
+	this->device_context_->IASetPrimitiveTopology(this->topology_);
+
 	this->vertex_buffer_->Setup();
 	this->index_buffer_->Setup();
 }

@@ -27,7 +27,7 @@ namespace Seed
 		
 		// Setup
 	public:
-		void Setup(void) const;
+		void Setup(void * constant_buffer) const;
 
 	private:
 		Shader(const DeviceContext & device_context) noexcept(false);

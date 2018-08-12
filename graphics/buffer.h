@@ -51,7 +51,7 @@ namespace Seed
 	public:
 		static std::unique_ptr<Buffer> IndexBuffer(const DeviceContext & device_context, const IndexCollection & indices);
 		static std::unique_ptr<Buffer> VertexBuffer(const DeviceContext & device_context, const VertexCollection & vertices);
-	
+
 		// Setup
 	public:
 		void Setup(void) const;

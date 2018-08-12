@@ -22,8 +22,8 @@ private:
 private:
 	PRIVATE_ENUM type_;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> data_;
-	size_t stride_;
-	size_t cnt_;
+	unsigned int stride_;
+	unsigned int cnt_;
 
 public:
 	void Initialize(const IndexCollection & indices);
@@ -68,10 +68,10 @@ Seed::Buffer::Buffer(const DeviceContext& device_context) noexcept(false)
 
 void Seed::Buffer::Impl::Initialize(const IndexCollection & indices)
 {
-	this->type_ = PRIVATE_ENUM::VERTEX;
+	this->type_ = PRIVATE_ENUM::INDEX;
 
-	this->stride_ = sizeof(Vertex);
-	this->cnt_ = indices.size();
+	this->stride_ = sizeof(unsigned int);
+	this->cnt_ = static_cast<unsigned int>(indices.size());
 
 	D3D11_BUFFER_DESC bd = {};
 	bd.ByteWidth = this->cnt_ * this->stride_;
@@ -89,10 +89,10 @@ void Seed::Buffer::Impl::Initialize(const IndexCollection & indices)
 
 void Seed::Buffer::Impl::Initialize(const VertexCollection & vertices)
 {
-	this->type_ = PRIVATE_ENUM::INDEX;
+	this->type_ = PRIVATE_ENUM::VERTEX;
 
 	this->stride_ = sizeof(Vertex);
-	this->cnt_ = vertices.size();
+	this->cnt_ = static_cast<unsigned int>(vertices.size());
 
 	D3D11_BUFFER_DESC bd = {};
 	bd.ByteWidth = this->cnt_ * this->stride_;

@@ -46,7 +46,7 @@ private:
 
 public:
 	void Initialize(std::string file_name);
-	void Setup(void) const;
+	void Setup(void * constant_buffer) const;
 };
 
 Seed::Shader::~Shader(void)
@@ -62,9 +62,10 @@ std::unique_ptr<Seed::Shader> Seed::Shader::Create(const DeviceContext & device_
 	return shader;
 }
 
-void Seed::Shader::Setup(void) const
+void Seed::Shader::Setup(void * constant_buffer) const
 {
-	this->impl_->Setup();
+	if(constant_buffer != nullptr)
+		this->impl_->Setup(constant_buffer);
 }
 
 Seed::Shader::Shader(const DeviceContext & device_context) noexcept(false)
@@ -90,7 +91,7 @@ void Seed::Shader::Impl::CreateInputLayoutAndConstantBufferFromShader(ID3DBlob *
 	D3D11_SHADER_BUFFER_DESC desc;
 	cb->GetDesc(&desc);
 
-	for (size_t j = 0; j < desc.Variables; ++j)
+	for (unsigned int j = 0; j < desc.Variables; ++j)
 	{
 		auto v = cb->GetVariableByIndex(j);
 		D3D11_SHADER_VARIABLE_DESC vdesc;
@@ -134,7 +135,7 @@ void Seed::Shader::Impl::CreateInputLayoutAndConstantBufferFromShader(ID3DBlob *
 	}
 
 	if (!element.empty())
-		if (FAILED(device->CreateInputLayout(&element[0], element.size(),
+		if (FAILED(device->CreateInputLayout(&element[0], static_cast<unsigned int>(element.size()),
 			blob->GetBufferPointer(), blob->GetBufferSize(), this->input_layout_.GetAddressOf())))
 			std::cout << "インプットレイアウトの作成に失敗しました。" << std::endl;
 }
@@ -243,8 +244,12 @@ void Seed::Shader::Impl::Initialize(std::string file_name)
 	}
 }
 
-void Seed::Shader::Impl::Setup(void) const
+void Seed::Shader::Impl::Setup(void * constant_buffer) const
 {
+	this->device_context_->IASetInputLayout(this->input_layout_.Get());
+
+	this->device_context_->UpdateSubresource(this->constant_buffer_.Get(), 0, nullptr, constant_buffer, 0, 0);
+
 	this->device_context_->VSSetShader(this->vertex_shader_.Get(), nullptr, 0);
 	this->device_context_->GSSetShader(this->geometry_shader_.Get(), nullptr, 0);
 	this->device_context_->HSSetShader(this->hull_shader_.Get(), nullptr, 0);

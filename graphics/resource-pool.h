@@ -28,7 +28,7 @@ public:
 
 		this->pool_.emplace_back(std::move(data));
 
-		return pool_.size() - 1;
+		return static_cast<unsigned int>(pool_.size() - 1);
 	}
 	void Unload(const unsigned int & key)
 	{

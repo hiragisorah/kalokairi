@@ -24,8 +24,9 @@ namespace Seed
 
 		// Factory
 	private:
+		static std::unique_ptr<Geometry> Plane(const DeviceContext & device_context, const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size = { 1, 1 });
 		static std::unique_ptr<Geometry> Box(const DeviceContext & device_context, const DirectX::XMFLOAT3 & size = { 1, 1, 1 });
-		static std::unique_ptr<Geometry> Sphere(const DeviceContext & device_context, const float & diameter = 1, const size_t & tessellation = 16);
+		static std::unique_ptr<Geometry> Sphere(const DeviceContext & device_context, const float & diameter = 1, const unsigned int & tessellation = 16);
 
 	private:
 		void Draw(void) const;

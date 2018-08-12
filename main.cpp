@@ -2,9 +2,9 @@
 
 #include "graphics/graphics.h"
 
-int main(void)
-{
-
-	rewind(stdin);
-	getchar();
-}
+//int main(void)
+//{
+//
+//	rewind(stdin);
+//	getchar();
+//}

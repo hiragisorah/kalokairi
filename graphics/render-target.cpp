@@ -58,6 +58,12 @@ void Seed::RenderTarget::Clear(void) const
 	this->impl_->Clear();
 }
 
+Seed::RenderTarget::RenderTarget(const SwapChain & swap_chain, const DeviceContext & device_context) noexcept(false)
+	: impl_(std::make_unique<Impl>(swap_chain, device_context))
+{
+
+}
+
 ID3D11RenderTargetView * const Seed::RenderTarget::Impl::GetRTV(void) const
 {
 	return this->rtv_.Get();
@@ -87,6 +93,6 @@ void Seed::RenderTarget::Impl::BackBuffer(void)
 
 void Seed::RenderTarget::Impl::Clear(void) const
 {
-	float color[4] = {};
+	float color[4] = { .2f,.4f,.8f,1.f };
 	this->device_context_->ClearRenderTargetView(this->rtv_.Get(), color);
 }
