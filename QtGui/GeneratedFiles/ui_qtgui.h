@@ -35,7 +35,7 @@ QT_BEGIN_NAMESPACE
 class Ui_QtGuiClass
 {
 public:
-    QAction *actionOpen;
+    QAction *actionImport;
     QAction *actionExport;
     QWidget *centralWidget;
     QCheckBox *wire_mode_check;
@@ -116,6 +116,8 @@ public:
     QHBoxLayout *horizontalLayout_11;
     QSpinBox *sphere_tesselation;
     QWidget *tab_4;
+    QGroupBox *groupBox_12;
+    QComboBox *material_combo;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -129,8 +131,8 @@ public:
         QFont font;
         font.setFamily(QString::fromUtf8("\343\203\241\343\202\244\343\203\252\343\202\252"));
         QtGuiClass->setFont(font);
-        actionOpen = new QAction(QtGuiClass);
-        actionOpen->setObjectName(QStringLiteral("actionOpen"));
+        actionImport = new QAction(QtGuiClass);
+        actionImport->setObjectName(QStringLiteral("actionImport"));
         actionExport = new QAction(QtGuiClass);
         actionExport->setObjectName(QStringLiteral("actionExport"));
         centralWidget = new QWidget(QtGuiClass);
@@ -360,11 +362,11 @@ public:
         primitive_group = new QGroupBox(centralWidget);
         primitive_group->setObjectName(QStringLiteral("primitive_group"));
         primitive_group->setEnabled(false);
-        primitive_group->setGeometry(QRect(1040, 340, 311, 311));
+        primitive_group->setGeometry(QRect(1040, 340, 311, 231));
         primitive_group->setFont(font);
         primitive_type = new QTabWidget(primitive_group);
         primitive_type->setObjectName(QStringLiteral("primitive_type"));
-        primitive_type->setGeometry(QRect(10, 30, 291, 271));
+        primitive_type->setGeometry(QRect(10, 30, 291, 191));
         tab_5 = new QWidget();
         tab_5->setObjectName(QStringLiteral("tab_5"));
         primitive_type->addTab(tab_5, QString());
@@ -556,6 +558,12 @@ public:
         tab_4 = new QWidget();
         tab_4->setObjectName(QStringLiteral("tab_4"));
         primitive_type->addTab(tab_4, QString());
+        groupBox_12 = new QGroupBox(centralWidget);
+        groupBox_12->setObjectName(QStringLiteral("groupBox_12"));
+        groupBox_12->setGeometry(QRect(1040, 570, 311, 81));
+        material_combo = new QComboBox(groupBox_12);
+        material_combo->setObjectName(QStringLiteral("material_combo"));
+        material_combo->setGeometry(QRect(10, 30, 291, 31));
         QtGuiClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QtGuiClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -571,7 +579,7 @@ public:
         QtGuiClass->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
-        menuFile->addAction(actionOpen);
+        menuFile->addAction(actionImport);
         menuFile->addAction(actionExport);
 
         retranslateUi(QtGuiClass);
@@ -585,7 +593,7 @@ public:
     void retranslateUi(QMainWindow *QtGuiClass)
     {
         QtGuiClass->setWindowTitle(QApplication::translate("QtGuiClass", "Model Editor", nullptr));
-        actionOpen->setText(QApplication::translate("QtGuiClass", "Import", nullptr));
+        actionImport->setText(QApplication::translate("QtGuiClass", "Import", nullptr));
         actionExport->setText(QApplication::translate("QtGuiClass", "Export", nullptr));
         wire_mode_check->setText(QApplication::translate("QtGuiClass", "WireMode", nullptr));
         groupBox->setTitle(QApplication::translate("QtGuiClass", "Game Screen", nullptr));
@@ -626,6 +634,7 @@ public:
         egsdge->setTitle(QApplication::translate("QtGuiClass", "Tesselation", nullptr));
         primitive_type->setTabText(primitive_type->indexOf(tab_3), QApplication::translate("QtGuiClass", "Sphere", nullptr));
         primitive_type->setTabText(primitive_type->indexOf(tab_4), QApplication::translate("QtGuiClass", "Capsule", nullptr));
+        groupBox_12->setTitle(QApplication::translate("QtGuiClass", "Material", nullptr));
         menuFile->setTitle(QApplication::translate("QtGuiClass", "File", nullptr));
     } // retranslateUi
 

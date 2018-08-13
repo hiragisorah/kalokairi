@@ -10,22 +10,27 @@
 
 struct ItemData
 {
+	static unsigned int cnt;
+
 	ItemData(void)
-		: parent(nullptr)
-		, position({0,0,0})
-		, rotation({0,0,0})
-		, scale({1,1,1})
+		: self(cnt)
+		, parent(-1)
+		, position({ 0,0,0 })
+		, rotation({ 0,0,0 })
+		, scale({ 1,1,1 })
 		, primitive_id(-1)
 		, primitive_type(0)
 		, plane_div_x(1)
 		, plane_div_y(1)
 		, plane_size({ 0.5f, 0.5f })
-		, box_size({.1f,.1f,.1f})
+		, box_size({ .1f,.1f,.1f })
 		, sphere_tesselation(16)
 		, sphere_diameter(1.f)
 	{}
 
-	QListWidgetItem * parent;
+	unsigned int self;
+
+	int parent;
 	
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT3 rotation;
@@ -44,6 +49,8 @@ struct ItemData
 
 	unsigned int sphere_tesselation;
 	float sphere_diameter;
+
+	std::string name;
 };
 
 class QtGui : public QMainWindow
@@ -71,7 +78,17 @@ private:
 	} wvp;
 
 private:
-	std::unordered_map<QListWidgetItem*, ItemData> saved_data;
+	std::unordered_map<unsigned int, ItemData> main_data;
+	std::unordered_map<QListWidgetItem*, unsigned int> item_to_no;
+	std::unordered_map<unsigned int, QListWidgetItem*> no_to_item;
+
+private:
+	std::unordered_map<unsigned int, ItemData> save_data;
+	unsigned int saved_cnt;
+
+private:
+	ItemData & GetData(unsigned int no);
+	ItemData & GetData(QListWidgetItem * item);
 
 private slots:
 	void on_add_button_pressed(void);
@@ -112,6 +129,9 @@ private slots:
 
 	void on_wire_mode_check_toggled(bool toggle);
 
+	void actionImport(void);
+	void actionExport(void);
+
 private:
 	unsigned int rtv;
 	unsigned int dsv;
@@ -120,4 +140,7 @@ private:
 
 private:
 	void UpdatePrimitive(void);
+
+	void Save(void);
+	void Load(void);
 };

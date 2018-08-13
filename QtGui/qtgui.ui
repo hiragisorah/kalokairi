@@ -961,7 +961,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
+    <addaction name="actionImport"/>
     <addaction name="actionExport"/>
    </widget>
    <addaction name="menuFile"/>
@@ -975,7 +975,7 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionOpen">
+  <action name="actionImport">
    <property name="text">
     <string>Import</string>
    </property>
