@@ -3,9 +3,10 @@
 #include <DirectXMath.h>
 
 #include <QtWidgets/QMainWindow>
+#include <qtimer.h>
 #include <unordered_map>
 
-#include "ui_qtgui.h"
+#include "ui_hierarchy-animation-editor.h"
 #include "..\graphics\graphics.h"
 
 #include <cereal/types/string.hpp>
@@ -36,7 +37,7 @@ struct ItemData
 	int self;
 
 	int parent;
-	
+
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT3 rotation;
 	DirectX::XMFLOAT3 scale;
@@ -44,10 +45,10 @@ struct ItemData
 	int primitive_id;
 
 	unsigned int primitive_type;
-	
+
 	unsigned int plane_div_x;
 	unsigned int plane_div_y;
-	
+
 	DirectX::XMFLOAT2 plane_size;
 
 	DirectX::XMFLOAT3 box_size;
@@ -66,16 +67,35 @@ struct ItemData
 	}
 };
 
-class QtGui : public QMainWindow
+struct AnimData
+{
+	AnimData(void)
+	{
+		frames.resize(5);
+		speed.resize(5);
+
+		for (auto & sp : speed)
+			sp = 0.01f;
+	}
+
+	static unsigned int cnt;
+
+	std::string name;
+
+	std::vector<std::unordered_map<int, ItemData>> frames;
+	std::vector<float> speed;
+};
+
+class hierarchyanimationeditor : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	QtGui(QWidget *parent = Q_NULLPTR);
+	hierarchyanimationeditor(QWidget *parent = Q_NULLPTR);
 
 public:
-	Ui::QtGuiClass ui;
-	
+	Ui::hierarchyanimationeditorClass ui;
+
 private:
 	Seed::Graphics graphics;
 
@@ -94,20 +114,34 @@ private:
 	std::unordered_map<int, ItemData> main_data;
 	std::vector<int> item_no;
 
+	std::unordered_map<int, AnimData> anim_data;
+	std::vector<int> anim_no;
+
+	std::unordered_map<int, ItemData> play_data;
+	float current_data;
+	bool play;
+
 private:
 	ItemData & GetData(int no);
+	ItemData & GetPlayData(int no);
+
+private:
+	QTimer * timer;
 
 private slots:
+	void Update(void);
+
 	void on_add_button_pressed(void);
 
 	void on_delete_button_pressed(void);
 
-	void on_clear_button_pressed(void);
-
 	void on_rename_button_pressed(void);
 
-	void on_parent_combo_currentIndexChanged(int row);
+	void on_play_button_pressed(void);
 
+	void on_pause_button_pressed(void);
+
+	void on_animation_list_currentRowChanged(int row);
 	void on_parts_list_currentRowChanged(int row);
 
 	void on_position_x_valueChanged(double value);
@@ -122,19 +156,9 @@ private slots:
 	void on_scale_y_valueChanged(double value);
 	void on_scale_z_valueChanged(double value);
 
-	void on_primitive_type_currentChanged(int value);
+	void on_anim_max_valueChanged(int value);
 
-	void on_plane_div_x_valueChanged(int value);
-	void on_plane_div_y_valueChanged(int value);
-	void on_plane_size_x_valueChanged(double value);
-	void on_plane_size_y_valueChanged(double value);
-
-	void on_box_size_x_valueChanged(double value);
-	void on_box_size_y_valueChanged(double value);
-	void on_box_size_z_valueChanged(double value);
-
-	void on_sphere_diameter_valueChanged(double value);
-	void on_sphere_tesselation_valueChanged(int value);
+	void on_anim_slider_valueChanged(int value);
 
 	void on_wire_mode_check_toggled(bool toggle);
 
@@ -148,7 +172,7 @@ private:
 	unsigned int shader;
 
 private:
-	void UpdatePrimitive(int row);
+	void UpdatePrimitive(void);
 
 	void Save(void);
 	void Load(void);

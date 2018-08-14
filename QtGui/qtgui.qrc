@@ -1,4 +1,4 @@
 <RCC>
-    <qresource prefix="QtGui">
+    <qresource prefix="HierarchyAnimationEditor">
     </qresource>
 </RCC>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B12702AD-ABFB-343A-A199-8E24837244A3}</ProjectGuid>
+    <ProjectGuid>{0A950FE3-EFBA-43B5-BD59-D57F39D1FF11}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -113,28 +113,25 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hierarchy-animation-editor.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="qtgui.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="qtgui.h" />
+    <QtMoc Include="hierarchy-animation-editor.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="qtgui.ui" />
+    <QtUic Include="hierarchy-animation-editor.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="qtgui.qrc" />
+    <QtRcc Include="hierarchy-animation-editor.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="QtGui.rc" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\graphics\graphics.vcxproj">
       <Project>{a9901988-d5b1-461e-88ea-5dbca9b6ea13}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

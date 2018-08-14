@@ -45,6 +45,7 @@ public:
     QListWidget *parts_list;
     QPushButton *add_button;
     QPushButton *delete_button;
+    QPushButton *clear_button;
     QGroupBox *transform_group;
     QGroupBox *groupBox_4;
     QWidget *horizontalLayoutWidget;
@@ -159,16 +160,20 @@ public:
         groupBox_2->setFont(font);
         parts_list = new QListWidget(groupBox_2);
         parts_list->setObjectName(QStringLiteral("parts_list"));
-        parts_list->setGeometry(QRect(10, 30, 171, 481));
+        parts_list->setGeometry(QRect(10, 30, 171, 441));
         add_button = new QPushButton(groupBox_2);
         add_button->setObjectName(QStringLiteral("add_button"));
-        add_button->setGeometry(QRect(10, 520, 171, 31));
+        add_button->setGeometry(QRect(10, 480, 171, 31));
         add_button->setFont(font);
         delete_button = new QPushButton(groupBox_2);
         delete_button->setObjectName(QStringLiteral("delete_button"));
         delete_button->setEnabled(false);
-        delete_button->setGeometry(QRect(10, 560, 171, 31));
+        delete_button->setGeometry(QRect(10, 520, 171, 31));
         delete_button->setFont(font);
+        clear_button = new QPushButton(groupBox_2);
+        clear_button->setObjectName(QStringLiteral("clear_button"));
+        clear_button->setGeometry(QRect(10, 560, 171, 31));
+        clear_button->setFont(font);
         transform_group = new QGroupBox(centralWidget);
         transform_group->setObjectName(QStringLiteral("transform_group"));
         transform_group->setEnabled(false);
@@ -458,7 +463,7 @@ public:
         groupBox_10->setGeometry(QRect(10, 10, 271, 61));
         horizontalLayoutWidget_7 = new QWidget(groupBox_10);
         horizontalLayoutWidget_7->setObjectName(QStringLiteral("horizontalLayoutWidget_7"));
-        horizontalLayoutWidget_7->setGeometry(QRect(10, 20, 251, 31));
+        horizontalLayoutWidget_7->setGeometry(QRect(10, 20, 270, 31));
         horizontalLayout_8 = new QHBoxLayout(horizontalLayoutWidget_7);
         horizontalLayout_8->setSpacing(6);
         horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
@@ -567,7 +572,7 @@ public:
         QtGuiClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QtGuiClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1361, 29));
+        menuBar->setGeometry(QRect(0, 0, 1361, 26));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         QtGuiClass->setMenuBar(menuBar);
@@ -600,6 +605,7 @@ public:
         groupBox_2->setTitle(QApplication::translate("QtGuiClass", "Parts", nullptr));
         add_button->setText(QApplication::translate("QtGuiClass", "Add", nullptr));
         delete_button->setText(QApplication::translate("QtGuiClass", "Delete", nullptr));
+        clear_button->setText(QApplication::translate("QtGuiClass", "Clear", nullptr));
         transform_group->setTitle(QApplication::translate("QtGuiClass", "Transform", nullptr));
         groupBox_4->setTitle(QApplication::translate("QtGuiClass", "Position", nullptr));
         label_3->setText(QApplication::translate("QtGuiClass", "X", nullptr));
