@@ -36,6 +36,8 @@ class Ui_hierarchyanimationeditorClass
 public:
     QAction *actionImport;
     QAction *actionExport;
+    QAction *actionImport2;
+    QAction *actionExport2;
     QWidget *centralWidget;
     QGroupBox *groupBox_2;
     QListWidget *parts_list;
@@ -95,6 +97,7 @@ public:
     QCheckBox *loop_check;
     QMenuBar *menuBar;
     QMenu *menuFile;
+    QMenu *menuAnimation;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -107,6 +110,10 @@ public:
         actionImport->setObjectName(QStringLiteral("actionImport"));
         actionExport = new QAction(hierarchyanimationeditorClass);
         actionExport->setObjectName(QStringLiteral("actionExport"));
+        actionImport2 = new QAction(hierarchyanimationeditorClass);
+        actionImport2->setObjectName(QStringLiteral("actionImport2"));
+        actionExport2 = new QAction(hierarchyanimationeditorClass);
+        actionExport2->setObjectName(QStringLiteral("actionExport2"));
         centralWidget = new QWidget(hierarchyanimationeditorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         groupBox_2 = new QGroupBox(centralWidget);
@@ -215,7 +222,8 @@ public:
         position_x->setWrapping(false);
         position_x->setProperty("showGroupSeparator", QVariant(false));
         position_x->setDecimals(2);
-        position_x->setMaximum(10);
+        position_x->setMinimum(-5);
+        position_x->setMaximum(5);
         position_x->setSingleStep(0.01);
 
         horizontalLayout_2->addWidget(position_x);
@@ -230,7 +238,8 @@ public:
         position_y->setWrapping(false);
         position_y->setProperty("showGroupSeparator", QVariant(false));
         position_y->setDecimals(2);
-        position_y->setMaximum(10);
+        position_y->setMinimum(-5);
+        position_y->setMaximum(5);
         position_y->setSingleStep(0.01);
 
         horizontalLayout_2->addWidget(position_y);
@@ -245,7 +254,8 @@ public:
         position_z->setWrapping(false);
         position_z->setProperty("showGroupSeparator", QVariant(false));
         position_z->setDecimals(2);
-        position_z->setMaximum(10);
+        position_z->setMinimum(-5);
+        position_z->setMaximum(5);
         position_z->setSingleStep(0.01);
 
         horizontalLayout_2->addWidget(position_z);
@@ -271,7 +281,8 @@ public:
         rotation_x->setWrapping(false);
         rotation_x->setProperty("showGroupSeparator", QVariant(false));
         rotation_x->setDecimals(2);
-        rotation_x->setMaximum(10);
+        rotation_x->setMinimum(-5);
+        rotation_x->setMaximum(5);
         rotation_x->setSingleStep(0.01);
 
         horizontalLayout_3->addWidget(rotation_x);
@@ -286,7 +297,8 @@ public:
         rotation_y->setWrapping(false);
         rotation_y->setProperty("showGroupSeparator", QVariant(false));
         rotation_y->setDecimals(2);
-        rotation_y->setMaximum(10);
+        rotation_y->setMinimum(-5);
+        rotation_y->setMaximum(5);
         rotation_y->setSingleStep(0.01);
 
         horizontalLayout_3->addWidget(rotation_y);
@@ -301,7 +313,8 @@ public:
         rotation_z->setWrapping(false);
         rotation_z->setProperty("showGroupSeparator", QVariant(false));
         rotation_z->setDecimals(2);
-        rotation_z->setMaximum(10);
+        rotation_z->setMinimum(-5);
+        rotation_z->setMaximum(5);
         rotation_z->setSingleStep(0.01);
 
         horizontalLayout_3->addWidget(rotation_z);
@@ -327,7 +340,8 @@ public:
         scale_x->setWrapping(false);
         scale_x->setProperty("showGroupSeparator", QVariant(false));
         scale_x->setDecimals(2);
-        scale_x->setMaximum(10);
+        scale_x->setMinimum(-5);
+        scale_x->setMaximum(5);
         scale_x->setSingleStep(0.01);
 
         horizontalLayout_5->addWidget(scale_x);
@@ -342,7 +356,8 @@ public:
         scale_y->setWrapping(false);
         scale_y->setProperty("showGroupSeparator", QVariant(false));
         scale_y->setDecimals(2);
-        scale_y->setMaximum(10);
+        scale_y->setMinimum(-5);
+        scale_y->setMaximum(5);
         scale_y->setSingleStep(0.01);
 
         horizontalLayout_5->addWidget(scale_y);
@@ -357,7 +372,8 @@ public:
         scale_z->setWrapping(false);
         scale_z->setProperty("showGroupSeparator", QVariant(false));
         scale_z->setDecimals(2);
-        scale_z->setMaximum(10);
+        scale_z->setMinimum(-5);
+        scale_z->setMaximum(5);
         scale_z->setSingleStep(0.01);
 
         horizontalLayout_5->addWidget(scale_z);
@@ -447,6 +463,8 @@ public:
         menuBar->setGeometry(QRect(0, 0, 1366, 26));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
+        menuAnimation = new QMenu(menuBar);
+        menuAnimation->setObjectName(QStringLiteral("menuAnimation"));
         hierarchyanimationeditorClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(hierarchyanimationeditorClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -456,8 +474,11 @@ public:
         hierarchyanimationeditorClass->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
+        menuBar->addAction(menuAnimation->menuAction());
         menuFile->addAction(actionImport);
         menuFile->addAction(actionExport);
+        menuAnimation->addAction(actionImport2);
+        menuAnimation->addAction(actionExport2);
 
         retranslateUi(hierarchyanimationeditorClass);
 
@@ -469,6 +490,8 @@ public:
         hierarchyanimationeditorClass->setWindowTitle(QApplication::translate("hierarchyanimationeditorClass", "Hierarchy Animation Editor", nullptr));
         actionImport->setText(QApplication::translate("hierarchyanimationeditorClass", "Import", nullptr));
         actionExport->setText(QApplication::translate("hierarchyanimationeditorClass", "Export", nullptr));
+        actionImport2->setText(QApplication::translate("hierarchyanimationeditorClass", "Import", nullptr));
+        actionExport2->setText(QApplication::translate("hierarchyanimationeditorClass", "Export", nullptr));
         groupBox_2->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Parts", nullptr));
         wire_mode_check->setText(QApplication::translate("hierarchyanimationeditorClass", "WireMode", nullptr));
         groupBox->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Game Screen", nullptr));
@@ -497,6 +520,7 @@ public:
         pause_button->setText(QApplication::translate("hierarchyanimationeditorClass", "Pause", nullptr));
         loop_check->setText(QApplication::translate("hierarchyanimationeditorClass", "Loop", nullptr));
         menuFile->setTitle(QApplication::translate("hierarchyanimationeditorClass", "File", nullptr));
+        menuAnimation->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Animation", nullptr));
     } // retranslateUi
 
 };

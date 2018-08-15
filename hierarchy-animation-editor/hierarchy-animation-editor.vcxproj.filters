@@ -45,5 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shader.dgsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

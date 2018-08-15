@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shader.dgsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\graphics\graphics.vcxproj">

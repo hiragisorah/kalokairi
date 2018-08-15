@@ -48,6 +48,8 @@ namespace Seed
 		const unsigned int CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size = { 1, 1 });
 		const unsigned int CreateBox(const DirectX::XMFLOAT3 & size = { 1, 1, 1 });
 		const unsigned int CreateSphere(const float & diameter = 1, const unsigned int & tessellation = 16);
+		const unsigned int CreateGeoSphere(const float & diameter = 1, const unsigned int & tessellation = 16);
+		const unsigned int CreateCapsule(const DirectX::XMFLOAT3 & p1, const DirectX::XMFLOAT3 & p2, const float & diameter = 1, const unsigned int & tessellation = 5);
 		void UnloadGeometry(const unsigned int & key);
 
 		// Setup

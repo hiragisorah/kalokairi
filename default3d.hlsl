@@ -4,9 +4,10 @@ SamplerState own_sampler : register(s0);
 
 cbuffer unique : register(b0)
 {
-    row_major matrix g_world;
-    row_major matrix g_view;
-    row_major matrix g_proj;
+    row_major matrix g_world : packoffset(c0);
+    row_major matrix g_view : packoffset(c4);
+    row_major matrix g_proj : packoffset(c8);
+    float3 g_eye : packoffset(c12);
 };
 
 //cbuffer camera : register(b1)
@@ -35,6 +36,8 @@ struct VsOut
     float4 position_ : TEXCOORD0;
     float4 normal_ : TEXCOORD1;
     float2 uv_ : TEXCOORD2;
+    float3 light_dir_ : TEXCOORD4;
+    float3 eye_dir_ : TEXCOORD5;
 };
 
 struct PsOut
@@ -53,19 +56,22 @@ VsOut VS(VsIn input)
     output.normal_.xyz = mul(input.normal_, (float3x3)g_world);
     output.uv_ = input.uv_;
 
+    //ライト方向で入力されるので、頂点 -> ライト位置とするために逆向きに変換する。なおアプリケーションで必ず正規化すること
+    output.light_dir_ = normalize(float3(50.f, -30.f, 0));
+    output.eye_dir_ = normalize(g_eye - output.position_.xyz);
+
     return output;
 }
 
 PsOut PS(VsOut input)
 {
     PsOut output = (PsOut) 0;
-
-	float3 N = normalize(input.normal_);
-	float3 L = normalize(float3(15.f, 15.f, 15));
-	float3 diffuse = max(dot(N, L), 0.0f) * 0.5f + 0.5f;
+    float3 el = input.light_dir_ - input.eye_dir_;
+    float3 diffuse = pow(saturate(dot(input.normal_.xyz, el)), float3(1, 1, 1));
 
     output.color_ = tex.Sample(own_sampler, input.uv_);
-    output.color_ = float4(diffuse, 1.f);
+    output.color_ = float4(1 - diffuse, 1.f);
+    output.color_ = input.normal_;
 
     return output;
 }

@@ -64,6 +64,8 @@ public:
 	const unsigned int CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size = { 1, 1 });
 	const unsigned int CreateBox(const DirectX::XMFLOAT3 & size);
 	const unsigned int CreateSphere(const float & diameter, const unsigned int & tessellation);
+	const unsigned int CreateGeoSphere(const float & diameter, const unsigned int & tessellation);
+	const unsigned int CreateCapsule(const DirectX::XMFLOAT3 & p1, const DirectX::XMFLOAT3 & p2, const float & diameter, const unsigned int & tessellation);
 
 	void UnloadViewPort(const unsigned int & key);
 	void UnloadRenderTarget(const unsigned int & key);
@@ -92,6 +94,16 @@ const unsigned int Seed::Graphics::CreateBox(const DirectX::XMFLOAT3 & size)
 const unsigned int Seed::Graphics::CreateSphere(const float & diameter, const unsigned int & tessellation)
 {
 	return this->impl_->CreateSphere(diameter, tessellation);
+}
+
+const unsigned int Seed::Graphics::CreateGeoSphere(const float & diameter, const unsigned int & tessellation)
+{
+	return this->impl_->CreateGeoSphere(diameter, tessellation);
+}
+
+const unsigned int Seed::Graphics::CreateCapsule(const DirectX::XMFLOAT3 & p1, const DirectX::XMFLOAT3 & p2, const float & diameter, const unsigned int & tessellation)
+{
+	return this->impl_->CreateCapsule(p1, p2, diameter, tessellation);
 }
 
 void Seed::Graphics::UnloadGeometry(const unsigned int & key)
@@ -335,6 +347,16 @@ const unsigned int Seed::Graphics::Impl::CreateBox(const DirectX::XMFLOAT3 & siz
 const unsigned int Seed::Graphics::Impl::CreateSphere(const float & diameter, const unsigned int & tessellation)
 {
 	return this->LoadGeometry(Geometry::Sphere(this->device_context_, diameter, tessellation));
+}
+
+const unsigned int Seed::Graphics::Impl::CreateGeoSphere(const float & diameter, const unsigned int & tessellation)
+{
+	return this->LoadGeometry(Geometry::GeoSphere(this->device_context_, diameter, tessellation));
+}
+
+const unsigned int Seed::Graphics::Impl::CreateCapsule(const DirectX::XMFLOAT3 & p1, const DirectX::XMFLOAT3 & p2, const float & diameter, const unsigned int & tessellation)
+{
+	return this->LoadGeometry(Geometry::Capsule(this->device_context_, p1, p2, diameter, tessellation));
 }
 
 void Seed::Graphics::Impl::UnloadViewPort(const unsigned int & key)

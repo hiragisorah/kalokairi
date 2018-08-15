@@ -299,8 +299,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -325,8 +328,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -351,8 +357,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -402,8 +411,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -428,8 +440,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -454,8 +469,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -505,8 +523,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -531,8 +552,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -557,8 +581,11 @@
          <property name="decimals">
           <number>2</number>
          </property>
+         <property name="minimum">
+          <double>-5.000000000000000</double>
+         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>5.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
@@ -771,7 +798,15 @@
     <addaction name="actionImport"/>
     <addaction name="actionExport"/>
    </widget>
+   <widget class="QMenu" name="menuAnimation">
+    <property name="title">
+     <string>Animation</string>
+    </property>
+    <addaction name="actionImport2"/>
+    <addaction name="actionExport2"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuAnimation"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -788,6 +823,16 @@
    </property>
   </action>
   <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionImport2">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="actionExport2">
    <property name="text">
     <string>Export</string>
    </property>

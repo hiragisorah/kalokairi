@@ -1,4 +1,5 @@
 #include "hierarchy-animation-editor.h"
+#include <QtWidgets/qfiledialog.h>
 
 unsigned int ItemData::cnt = 0;
 unsigned int AnimData::cnt = 0;
@@ -12,12 +13,17 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 	connect(ui.actionImport, SIGNAL(triggered()), this, SLOT(actionImport()));
 	connect(ui.actionExport, SIGNAL(triggered()), this, SLOT(actionExport()));
 
+	connect(ui.actionImport2, SIGNAL(triggered()), this, SLOT(actionImport2()));
+	connect(ui.actionExport2, SIGNAL(triggered()), this, SLOT(actionExport2()));
+
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(Update()));
 	timer->start(1000/60);
 
 	current_data = 0;
+
 	play = false;
+	loop = false;
 
 	auto & widget = ui.widget;
 	auto handle = reinterpret_cast<void*>(widget->winId());
@@ -46,53 +52,7 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 
 void hierarchyanimationeditor::paintEvent(QPaintEvent * ev)
 {
-	/*graphics.ClearTarget({ rtv }, { dsv });
 
-	if (ui.animation_list->currentItem() != nullptr)
-	{
-		for (int i = 0; i < ui.parts_list->count(); ++i)
-		{
-			auto item = GetData(i);
-
-			if (play)
-				item = GetPlayData(i);
-
-			if (item.primitive_id != -1)
-			{
-				auto world
-					= DirectX::XMMatrixScaling(item.scale.x, item.scale.y, item.scale.z)
-					* DirectX::XMMatrixRotationRollPitchYaw(item.rotation.x, item.rotation.y, item.rotation.z)
-					* DirectX::XMMatrixTranslation(item.position.x, item.position.y, item.position.z);
-
-				auto parent = item.parent;
-
-				while (parent != -1)
-				{
-					auto p = anim_data[anim_no[ui.animation_list->currentRow()]].frames[ui.anim_slider->value()][parent];
-
-					if (play)
-						p = play_data[parent];
-
-					auto p_world
-						= DirectX::XMMatrixScaling(p.scale.x, p.scale.y, p.scale.z)
-						* DirectX::XMMatrixRotationRollPitchYaw(p.rotation.x, p.rotation.y, p.rotation.z)
-						* DirectX::XMMatrixTranslation(p.position.x, p.position.y, p.position.z);
-
-					world *= p_world;
-
-					parent = p.parent;
-				}
-
-				wvp.world = world;
-
-				graphics.SetShader(shader, &wvp);
-
-				graphics.Draw(item.primitive_id);
-			}
-		}
-	}
-
-	graphics.Run();*/
 }
 
 ItemData & hierarchyanimationeditor::GetData(int no)
@@ -138,24 +98,36 @@ void hierarchyanimationeditor::Update(void)
 		auto row = anim_no[ui.animation_list->currentRow()];
 		auto & anim = anim_data[row];
 
-		anim_cnt = anim.frames.size() - 1;
+		anim_cnt = anim.frames.size();
 
-		current_data += anim.speed[static_cast<int>(current_data)];
-		if (current_data > static_cast<float>(anim_cnt))
+		current_data += anim.speed[(static_cast<int>(current_data) + 1) % (anim_cnt)];
+		if (loop)
 		{
-			current_data = static_cast<float>(anim_cnt);
+			if(current_data > static_cast<float>(anim_cnt))
+			{
+				current_data -= static_cast<float>(anim_cnt);
+			}
+		}
+		else
+		{
+			if (current_data > static_cast<float>(anim_cnt - 1))
+			{
+				current_data = static_cast<float>(anim_cnt - 1);
+			}
 		}
 	}
 		
-	auto row = anim_no[ui.animation_list->currentRow()];
-	auto & anim = anim_data[row];
-	auto value = static_cast<int>(current_data);
-
-	for (auto & frame : anim.frames[value])
+	if (play)
 	{
-		play_data[frame.first] = Linear(frame.second, anim.frames[std::min(value + 1, anim_cnt)][frame.first], current_data - value);
-	}
+		auto row = anim_no[ui.animation_list->currentRow()];
+		auto & anim = anim_data[row];
+		auto value = static_cast<int>(current_data) % anim_cnt;
 
+		for (auto & frame : anim.frames[value])
+		{
+			play_data[frame.first] = Linear(frame.second, anim.frames[(value + 1) % anim_cnt][frame.first], current_data - static_cast<int>(current_data));
+		}
+	}
 	graphics.ClearTarget({ rtv }, { dsv });
 
 	if (ui.animation_list->currentItem() != nullptr)
@@ -169,6 +141,11 @@ void hierarchyanimationeditor::Update(void)
 
 			if (item.primitive_id != -1)
 			{
+				auto offset
+					= DirectX::XMMatrixScaling(item.offset_scale.x, item.offset_scale.y, item.offset_scale.z)
+					* DirectX::XMMatrixRotationRollPitchYaw(item.offset_rotation.x, item.offset_rotation.y, item.offset_rotation.z)
+					* DirectX::XMMatrixTranslation(item.offset_position.x, item.offset_position.y, item.offset_position.z);
+
 				auto world
 					= DirectX::XMMatrixScaling(item.scale.x, item.scale.y, item.scale.z)
 					* DirectX::XMMatrixRotationRollPitchYaw(item.rotation.x, item.rotation.y, item.rotation.z)
@@ -193,7 +170,7 @@ void hierarchyanimationeditor::Update(void)
 					parent = p.parent;
 				}
 
-				wvp.world = world;
+				wvp.world = offset * world;
 
 				graphics.SetShader(shader, &wvp);
 
@@ -288,17 +265,20 @@ void hierarchyanimationeditor::on_parts_list_currentRowChanged(int row)
 		ui.transform_group->setEnabled(true);
 
 		{ // Transform Box
-			ui.position_x->setValue(static_cast<double>(GetData(row).position.x));
-			ui.position_y->setValue(static_cast<double>(GetData(row).position.y));
-			ui.position_z->setValue(static_cast<double>(GetData(row).position.z));
+			if (ui.animation_list->currentItem() != nullptr)
+			{
+				ui.position_x->setValue(static_cast<double>(GetData(row).position.x));
+				ui.position_y->setValue(static_cast<double>(GetData(row).position.y));
+				ui.position_z->setValue(static_cast<double>(GetData(row).position.z));
 
-			ui.rotation_x->setValue(static_cast<double>(GetData(row).rotation.x));
-			ui.rotation_y->setValue(static_cast<double>(GetData(row).rotation.y));
-			ui.rotation_z->setValue(static_cast<double>(GetData(row).rotation.z));
+				ui.rotation_x->setValue(static_cast<double>(GetData(row).rotation.x));
+				ui.rotation_y->setValue(static_cast<double>(GetData(row).rotation.y));
+				ui.rotation_z->setValue(static_cast<double>(GetData(row).rotation.z));
 
-			ui.scale_x->setValue(static_cast<double>(GetData(row).scale.x));
-			ui.scale_y->setValue(static_cast<double>(GetData(row).scale.y));
-			ui.scale_z->setValue(static_cast<double>(GetData(row).scale.z));
+				ui.scale_x->setValue(static_cast<double>(GetData(row).scale.x));
+				ui.scale_y->setValue(static_cast<double>(GetData(row).scale.y));
+				ui.scale_z->setValue(static_cast<double>(GetData(row).scale.z));
+			}
 		}
 	}
 }
@@ -400,14 +380,75 @@ void hierarchyanimationeditor::on_wire_mode_check_toggled(bool toggle)
 	graphics.EnableWireFrame(toggle);
 }
 
+void hierarchyanimationeditor::on_loop_check_toggled(bool toggle)
+{
+	loop = toggle;
+}
+
 void hierarchyanimationeditor::actionImport(void)
 {
-	Save();
+	QString sel_filter = tr("Hierarchy Model(*.hmodel)");
+	QString file_name = QFileDialog::getOpenFileName(
+		this,
+		tr("ファイルを開く"),
+		".",
+		tr("Hierarchy Model(*.hmodel)"),
+		&sel_filter,
+		QFileDialog::DontUseCustomDirectoryIcons
+	);
+	if (!file_name.isEmpty()) {
+		Load(file_name.toStdString());
+	}
 }
 
 void hierarchyanimationeditor::actionExport(void)
 {
-	Load();
+	QString sel_filter = tr("Hierarchy Model(*.hmodel)");
+	QString file_name = QFileDialog::getSaveFileName(
+		this,
+		tr("名前を付けて保存"),
+		".",
+		tr("Hierarchy Model(*.hmodel)"),
+		&sel_filter,
+		QFileDialog::DontUseCustomDirectoryIcons
+	);
+	if (!file_name.isEmpty())
+	{
+		Save(file_name.toStdString());
+	}
+}
+
+void hierarchyanimationeditor::actionImport2(void)
+{
+	QString sel_filter = tr("Hierarchy Animation(*.hanim)");
+	QString file_name = QFileDialog::getOpenFileName(
+		this,
+		tr("ファイルを開く"),
+		".",
+		tr("Hierarchy Animation(*.hanim)"),
+		&sel_filter,
+		QFileDialog::DontUseCustomDirectoryIcons
+	);
+	if (!file_name.isEmpty()) {
+		Load2(file_name.toStdString());
+	}
+}
+
+void hierarchyanimationeditor::actionExport2(void)
+{
+	QString sel_filter = tr("Hierarchy Animation(*.hanim)");
+	QString file_name = QFileDialog::getSaveFileName(
+		this,
+		tr("名前を付けて保存"),
+		".",
+		tr("Hierarchy Animation(*.hanim)"),
+		&sel_filter,
+		QFileDialog::DontUseCustomDirectoryIcons
+	);
+	if (!file_name.isEmpty())
+	{
+		Save2(file_name.toStdString());
+	}
 }
 
 void hierarchyanimationeditor::UpdatePrimitive(void)
@@ -435,27 +476,35 @@ void hierarchyanimationeditor::UpdatePrimitive(void)
 		}
 		else if (primitive_type == 3)
 		{
-			primitive_id = graphics.CreateSphere(item.sphere_diameter, item.sphere_tesselation);
+			primitive_id = graphics.CreateSphere(item.sphere_diameter, item.sphere_tessellation);
+		}
+		else if (primitive_type == 4)
+		{
+			primitive_id = graphics.CreateGeoSphere(item.geosphere_diameter, item.geosphere_tessellation);
+		}
+		else if (primitive_type == 5)
+		{
+			primitive_id = graphics.CreateCapsule(item.capsule_p1, item.capsule_p2, item.capsule_diameter, item.capsule_tessellation);
 		}
 	}
 }
 
-void hierarchyanimationeditor::Save(void)
+void hierarchyanimationeditor::Save(std::string file_name)
 {
-	std::ofstream os("../save.bin", std::ios::binary);
+	std::ofstream os(file_name, std::ios::binary);
 	cereal::BinaryOutputArchive on(os);
 	on(ItemData::cnt, main_data);
 
 	os.close();
 }
 
-void hierarchyanimationeditor::Load(void)
+void hierarchyanimationeditor::Load(std::string file_name)
 {
 	main_data.clear();
 	item_no.clear();
 	ui.parts_list->clear();
 
-	std::ifstream is("../save.bin", std::ios::binary);
+	std::ifstream is(file_name, std::ios::binary);
 	cereal::BinaryInputArchive in(is);
 	in(ItemData::cnt, main_data);
 
@@ -472,6 +521,56 @@ void hierarchyanimationeditor::Load(void)
 	UpdatePrimitive();
 
 	play_data = main_data;
+}
+
+void hierarchyanimationeditor::Save2(std::string file_name)
+{
+	std::ofstream os(file_name, std::ios::binary);
+	cereal::BinaryOutputArchive on(os);
+	on(AnimData::cnt, anim_data, main_data);
+
+	os.close();
+}
+
+void hierarchyanimationeditor::Load2(std::string file_name)
+{
+	anim_data.clear();
+	main_data.clear();
+	play_data.clear();
+	anim_no.clear();
+	item_no.clear();
+	ui.parts_list->clear();
+	ui.animation_list->clear();
+
+	std::ifstream is(file_name, std::ios::binary);
+	cereal::BinaryInputArchive in(is);
+	in(AnimData::cnt, anim_data, main_data);
+
+	is.close();
+
+	for (auto & data : main_data)
+	{
+		auto & sdata = data.second;
+
+		ui.parts_list->addItem(sdata.name.c_str());
+		item_no.emplace_back(sdata.self);
+	}
+
+	UpdatePrimitive();
+
+	play_data = main_data;
+
+	for (auto & data : anim_data)
+	{
+		auto & sdata = data.second;
+
+		ui.animation_list->addItem(sdata.name.c_str());
+		anim_no.emplace_back(sdata.self);
+
+		for (auto & frame : sdata.frames)
+			for (auto & mdata : main_data)
+				frame[mdata.first].primitive_id = mdata.second.primitive_id;
+	}
 }
 
 void hierarchyanimationeditor::on_add_button_pressed(void)
