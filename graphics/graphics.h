@@ -26,6 +26,9 @@ namespace Seed
 		void set_width(const unsigned int & width);
 		void set_height(const unsigned int & height);
 
+		const unsigned int & width(void);
+		const unsigned int & height(void);
+
 		// Factory
 	public:
 		// - ViewPort

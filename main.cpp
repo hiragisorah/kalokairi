@@ -1,10 +1,11 @@
 #include <iostream>
 
-#include "graphics/graphics.h"
+#include <vector>
 
-//int main(void)
-//{
-//
-//	rewind(stdin);
-//	getchar();
-//}
+int main(void)
+{
+	std::vector<int*> x;
+
+	rewind(stdin);
+	getchar();
+}

@@ -38,6 +38,9 @@ public:
 	void set_width(const unsigned int & width);
 	void set_height(const unsigned int & height);
 
+	const unsigned int & width(void);
+	const unsigned int & height(void);
+
 private:
 	ResourcePool<RenderTarget> render_target_pool_;
 	ResourcePool<DepthStencil> depth_stencil_pool_;
@@ -179,6 +182,16 @@ void Seed::Graphics::set_height(const unsigned int & height)
 	this->impl_->set_height(height);
 }
 
+const unsigned int & Seed::Graphics::width(void)
+{
+	return this->impl_->width();
+}
+
+const unsigned int & Seed::Graphics::height(void)
+{
+	return this->impl_->height();
+}
+
 const unsigned int Seed::Graphics::CreateDepthStencil(const unsigned int & width, const unsigned int & height)
 {
 	return this->impl_->CreateDepthStencil(width, height);
@@ -287,6 +300,16 @@ void Seed::Graphics::Impl::set_width(const unsigned int & width)
 void Seed::Graphics::Impl::set_height(const unsigned int & height)
 {
 	this->height_ = height;
+}
+
+const unsigned int & Seed::Graphics::Impl::width(void)
+{
+	return this->width_;
+}
+
+const unsigned int & Seed::Graphics::Impl::height(void)
+{
+	return this->height_;
 }
 
 const unsigned int Seed::Graphics::Impl::LoadViewPort(std::unique_ptr<ViewPort>&& view_port)

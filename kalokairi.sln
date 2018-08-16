@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kalokairi", "kalokairi.vcxproj", "{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "graphics", "graphics\graphics.vcxproj", "{A9901988-D5B1-461E-88EA-5DBCA9B6EA13}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtGui", "QtGui\QtGui.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hierarchy-animation-editor", "hierarchy-animation-editor\hierarchy-animation-editor.vcxproj", "{0A950FE3-EFBA-43B5-BD59-D57F39D1FF11}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "frame-work", "frame-work\frame-work.vcxproj", "{CA19BBF5-A35F-412C-A237-AE4B00EB7272}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kalokairi", "kalokairi\kalokairi.vcxproj", "{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Debug|x64.ActiveCfg = Debug|x64
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Debug|x64.Build.0 = Debug|x64
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Debug|x86.ActiveCfg = Debug|Win32
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Debug|x86.Build.0 = Debug|Win32
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Release|x64.ActiveCfg = Release|x64
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Release|x64.Build.0 = Release|x64
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Release|x86.ActiveCfg = Release|Win32
-		{F3C4FF7E-19A7-4872-AB8C-C0E9183EC08D}.Release|x86.Build.0 = Release|Win32
 		{A9901988-D5B1-461E-88EA-5DBCA9B6EA13}.Debug|x64.ActiveCfg = Debug|x64
 		{A9901988-D5B1-461E-88EA-5DBCA9B6EA13}.Debug|x64.Build.0 = Debug|x64
 		{A9901988-D5B1-461E-88EA-5DBCA9B6EA13}.Debug|x86.ActiveCfg = Debug|Win32
@@ -47,6 +41,20 @@ Global
 		{0A950FE3-EFBA-43B5-BD59-D57F39D1FF11}.Release|x64.ActiveCfg = Release|x64
 		{0A950FE3-EFBA-43B5-BD59-D57F39D1FF11}.Release|x64.Build.0 = Release|x64
 		{0A950FE3-EFBA-43B5-BD59-D57F39D1FF11}.Release|x86.ActiveCfg = Release|x64
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Debug|x64.ActiveCfg = Debug|x64
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Debug|x64.Build.0 = Debug|x64
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Debug|x86.ActiveCfg = Debug|Win32
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Debug|x86.Build.0 = Debug|Win32
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Release|x64.ActiveCfg = Release|x64
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Release|x64.Build.0 = Release|x64
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Release|x86.ActiveCfg = Release|Win32
+		{CA19BBF5-A35F-412C-A237-AE4B00EB7272}.Release|x86.Build.0 = Release|Win32
+		{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}.Debug|x64.ActiveCfg = Debug|x64
+		{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}.Debug|x64.Build.0 = Debug|x64
+		{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}.Debug|x86.ActiveCfg = Debug|x64
+		{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}.Release|x64.ActiveCfg = Release|x64
+		{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}.Release|x64.Build.0 = Release|x64
+		{EEBD5FC5-DB26-442A-8E4C-63A592FD04E9}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
