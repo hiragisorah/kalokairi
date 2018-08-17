@@ -3,8 +3,6 @@
 
 bool break_flag_1 = false;
 
-unsigned int ItemData::cnt = 0;
-
 QtGui::QtGui(QWidget *parent)
 	: QMainWindow(parent)
 {

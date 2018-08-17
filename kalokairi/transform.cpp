@@ -7,7 +7,8 @@ Transform::Transform(
 	DirectX::XMFLOAT3 offset_position,
 	DirectX::XMFLOAT3 offset_rotation,
 	DirectX::XMFLOAT3 offset_scale)
-	: position_(position)
+	: parent_(nullptr)
+	, position_(position)
 	, rotation_(rotation)
 	, scale_(scale)
 	, offset_position_(offset_position)
@@ -89,14 +90,14 @@ void Transform::set_scale(const DirectX::XMFLOAT3 & scale)
 DirectX::XMMATRIX Transform::TransformMatrix(void)
 {
 	return DirectX::XMMatrixScaling(this->scale_.x, this->scale_.y, this->scale_.z)
-		* DirectX::XMMatrixRotationRollPitchYaw(this->rotation_.x, this->rotation_.y, this->rotation_.z)
+		* DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(this->rotation_.x), DirectX::XMConvertToRadians(this->rotation_.y), DirectX::XMConvertToRadians(this->rotation_.z))
 		* DirectX::XMMatrixTranslation(this->position_.x, this->position_.y, this->position_.z);
 }
 
 DirectX::XMMATRIX Transform::OffsetMatrix(void)
 {
 	return DirectX::XMMatrixScaling(this->offset_scale_.x, this->offset_scale_.y, this->offset_scale_.z)
-		* DirectX::XMMatrixRotationRollPitchYaw(this->offset_rotation_.x, this->offset_rotation_.y, this->offset_rotation_.z)
+		* DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(this->offset_rotation_.x), DirectX::XMConvertToRadians(this->offset_rotation_.y), DirectX::XMConvertToRadians(this->offset_rotation_.z))
 		* DirectX::XMMatrixTranslation(this->offset_position_.x, this->offset_position_.y, this->offset_position_.z);
 }
 

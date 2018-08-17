@@ -1,6 +1,7 @@
 #pragma once
 
 #include "transform.h"
+#include <unordered_map>
 
 struct MainBuffer
 {
@@ -37,3 +38,5 @@ private:
 public:
 	Transform * const transform(void) const;
 };
+
+using HierarchyModelList = std::unordered_map<int, HierarchyModel>;

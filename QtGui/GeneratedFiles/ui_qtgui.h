@@ -37,6 +37,8 @@ class Ui_QtGuiClass
 public:
     QAction *actionImport;
     QAction *actionExport;
+    QAction *actionImport2;
+    QAction *actionExport2;
     QWidget *centralWidget;
     QCheckBox *wire_mode_check;
     QGroupBox *groupBox;
@@ -190,6 +192,10 @@ public:
         actionImport->setObjectName(QStringLiteral("actionImport"));
         actionExport = new QAction(QtGuiClass);
         actionExport->setObjectName(QStringLiteral("actionExport"));
+        actionImport2 = new QAction(QtGuiClass);
+        actionImport2->setObjectName(QStringLiteral("actionImport2"));
+        actionExport2 = new QAction(QtGuiClass);
+        actionExport2->setObjectName(QStringLiteral("actionExport2"));
         centralWidget = new QWidget(QtGuiClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         wire_mode_check = new QCheckBox(centralWidget);
@@ -979,7 +985,7 @@ public:
         retranslateUi(QtGuiClass);
 
         transform_type->setCurrentIndex(0);
-        primitive_type->setCurrentIndex(3);
+        primitive_type->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(QtGuiClass);
@@ -990,6 +996,8 @@ public:
         QtGuiClass->setWindowTitle(QApplication::translate("QtGuiClass", "Hierarchy Model Editor", nullptr));
         actionImport->setText(QApplication::translate("QtGuiClass", "Import", nullptr));
         actionExport->setText(QApplication::translate("QtGuiClass", "Export", nullptr));
+        actionImport2->setText(QApplication::translate("QtGuiClass", "Import", nullptr));
+        actionExport2->setText(QApplication::translate("QtGuiClass", "Export", nullptr));
         wire_mode_check->setText(QApplication::translate("QtGuiClass", "WireMode", nullptr));
         groupBox->setTitle(QApplication::translate("QtGuiClass", "Game Screen", nullptr));
         groupBox_2->setTitle(QApplication::translate("QtGuiClass", "Parts", nullptr));
@@ -1052,7 +1060,7 @@ public:
         label_21->setText(QApplication::translate("QtGuiClass", "Y", nullptr));
         label_22->setText(QApplication::translate("QtGuiClass", "Z", nullptr));
         primitive_type->setTabText(primitive_type->indexOf(tab_7), QApplication::translate("QtGuiClass", "Capsule", nullptr));
-        menuFile->setTitle(QApplication::translate("QtGuiClass", "File", nullptr));
+        menuFile->setTitle(QApplication::translate("QtGuiClass", "Model", nullptr));
     } // retranslateUi
 
 };

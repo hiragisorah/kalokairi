@@ -1,6 +1,10 @@
 #include "kalokairi.h"
 #include "main_scene.h"
 
+static std::unordered_map<Qt::Key, Input::KeyState> _keys;
+static std::unordered_map<Qt::Key, bool> _new_keys;
+static std::unordered_map<Qt::Key, bool> _old_keys;
+
 Kalokairi::Kalokairi(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -29,6 +33,8 @@ Kalokairi::Kalokairi(QWidget *parent)
 
 void Kalokairi::Update(void)
 {
+	Input::Update();
+
 	if (!this->engine_->Run())
 	{
 		this->timer_->stop();
@@ -59,4 +65,45 @@ void Kalokairi::closeEvent(QCloseEvent * event)
 		delete this->graphics_;
 		delete this->engine_;
 	}
+}
+
+void Kalokairi::keyPressEvent(QKeyEvent * event)
+{
+	_new_keys[static_cast<Qt::Key>(event->key())] = true;
+}
+
+void Kalokairi::keyReleaseEvent(QKeyEvent * event)
+{
+	_new_keys[static_cast<Qt::Key>(event->key())] = false;
+}
+
+void Input::Update(void)
+{
+	for (auto & key : _new_keys)
+	{
+		auto & new_status = _new_keys[key.first];
+		auto & old_status = _old_keys[key.first];
+
+		if (!old_status && !new_status) _keys[key.first] = Input::KeyState::None;
+		if (!old_status && new_status) _keys[key.first] = Input::KeyState::Trigger;
+		if (old_status && new_status) _keys[key.first] = Input::KeyState::Press;
+		if (old_status && !new_status) _keys[key.first] = Input::KeyState::Release;
+
+		old_status = new_status;
+	}
+}
+
+bool Input::Trigger(const Qt::Key & key)
+{
+	return _keys[key] == Input::KeyState::Trigger;
+}
+
+bool Input::Release(const Qt::Key & key)
+{
+	return _keys[key] == Input::KeyState::Release;
+}
+
+bool Input::Press(const Qt::Key & key)
+{
+	return _keys[key] == Input::KeyState::Press;
 }
