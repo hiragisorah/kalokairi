@@ -194,6 +194,8 @@ private slots:
 	void on_scale_y_valueChanged(double value);
 	void on_scale_z_valueChanged(double value);
 
+	void on_speed_valueChanged(double value);
+
 	void on_anim_max_valueChanged(int value);
 
 	void on_anim_slider_valueChanged(int value);

@@ -3,19 +3,22 @@
 #include <unordered_map>
 
 #include "hierarchy-model.h"
+#include <algorithm>
 
 struct AnimationTransform
 {
 	AnimationTransform(void)
-		: position_({ 0,0,0 })
-		, rotation_({ 0,0,0 })
-		, scale_({ 1,1,1 })
+		: position_(DirectX::Vector3::Zero)
+		, rotation_(DirectX::Vector3::Zero)
+		, scale_(DirectX::Vector3(1, 1, 1))
 	{}
 
-	DirectX::XMFLOAT3 position_;
-	DirectX::XMFLOAT3 rotation_;
-	DirectX::XMFLOAT3 scale_;
+	DirectX::Vector3 position_;
+	DirectX::Vector3 rotation_;
+	DirectX::Vector3 scale_;
 };
+
+#undef min
 
 static AnimationTransform Linear(AnimationTransform & a, AnimationTransform & b, float progress)
 {
@@ -36,6 +39,44 @@ static AnimationTransform Linear(AnimationTransform & a, AnimationTransform & b,
 	return ret;
 }
 
+constexpr float default_distance = 10.f;
+constexpr float default_rotation = 50.f;
+constexpr float default_scale = 10.f;
+
+static AnimationTransform Completion(const AnimationTransform & a, const AnimationTransform & b, const float & speed, bool & check)
+{
+	AnimationTransform ret;
+
+	auto dist = DirectX::Vector3::Distance(a.position_, b.position_);
+	auto diff = b.position_ - a.position_;
+
+	auto x = std::min((default_distance * speed) / dist, 1.f);
+
+	ret.position_ = a.position_ + diff * x;
+
+	if (fabsf(dist) > 0.001f) check = false;
+
+	dist = DirectX::Vector3::Distance(a.rotation_, b.rotation_);
+	diff = b.rotation_ - a.rotation_;
+
+	x = std::min((default_rotation * speed) / dist, 1.f);
+
+	ret.rotation_ = a.rotation_ + diff * x;
+
+	if (fabsf(dist) > 0.001f) check = false;
+
+	dist = DirectX::Vector3::Distance(a.scale_, b.scale_);
+	diff = b.scale_ - a.scale_;
+
+	x = std::min((default_scale * speed) / dist, 1.f);
+
+	ret.scale_ = a.scale_ + diff * x;
+
+	if (fabsf(dist) > 0.001f) check = false;
+
+	return ret;
+}
+
 struct AnimationFrame
 {
 	AnimationFrame(void)
@@ -49,7 +90,14 @@ struct AnimationFrame
 
 struct Animation
 {
+	Animation(void)
+		: current_index_(0)
+		, is_loop_(true)
+	{}
+
 	std::vector<AnimationFrame> frames_;
+	int current_index_;
+	bool is_loop_;
 };
 
 class HierarchyAnimation
@@ -70,18 +118,11 @@ public:
 	void set_animation(const std::string & animation_name, const Animation & animation);
 
 public:
-	void SetAnimation(const std::string & animation_name);
+	void SetAnimation(const std::string & animation_name, const int & priority);
+	void SetAnimation(Animation * const animation, const int & priority);
 
 private:
-	AnimationFrame check_point_;
-	AnimationFrame new_transform_;
-	Animation * current_animation_;
-	Animation * next_animation_;
-
-	bool is_check_point_;
-
-	int current_index_;
-	float progress_;
+	Animation * next_animation_[10];
 
 public:
 	void Update(void);

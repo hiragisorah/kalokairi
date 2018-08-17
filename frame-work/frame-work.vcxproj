@@ -120,6 +120,7 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="SimpleMath.h" />
     <ClInclude Include="system.h" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +128,7 @@
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="SimpleMath.cpp" />
     <ClCompile Include="system.cpp" />
   </ItemGroup>
   <ItemGroup>

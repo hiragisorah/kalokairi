@@ -1,10 +1,9 @@
 #include "hierarchy-animation.h"
 
 HierarchyAnimation::HierarchyAnimation(void)
-	: current_animation_(nullptr)
-	, next_animation_(nullptr)
-	, current_index_(0)
 {
+	for (auto & anim : this->next_animation_)
+		anim = nullptr;
 }
 
 void HierarchyAnimation::set_model_list(HierarchyModelList * const model_list)
@@ -17,69 +16,70 @@ void HierarchyAnimation::set_animation(const std::string & animation_name, const
 	this->animations_[animation_name] = animation;
 }
 
-void HierarchyAnimation::SetAnimation(const std::string & animation_name)
+void HierarchyAnimation::SetAnimation(const std::string & animation_name, const int & priority)
 {
-	this->next_animation_ = &this->animations_[animation_name];
+	this->SetAnimation(&this->animations_[animation_name], priority);
+}
 
-	if (this->current_animation_ == nullptr)
-		this->current_animation_ = this->next_animation_;
-	
-	this->check_point_.transforms_ = this->new_transform_.transforms_;
+void HierarchyAnimation::SetAnimation(Animation * const animation, const int & priority)
+{
+	if (this->next_animation_[priority] == animation) return;
 
-	this->is_check_point_ = true;
-	this->progress_ = 0;
+	this->next_animation_[priority] = animation;
+
+	animation->current_index_ = 0;
 }
 
 void HierarchyAnimation::Update(void)
 {
-	auto current_frame = &this->current_animation_->frames_[(this->current_index_ + 0) % this->current_animation_->frames_.size()];
-	auto next_frame = &this->current_animation_->frames_[(this->current_index_ + 1) % this->current_animation_->frames_.size()];
+	std::vector<int> parts_check;
 
-	if (this->next_animation_ != this->current_animation_)
+	for (auto & next_animation : this->next_animation_)
 	{
-		next_frame = &this->next_animation_->frames_[0];
-	}
+		if (next_animation == nullptr) continue;
 
-	for (auto & transform : current_frame->transforms_)
-	{
-		auto & key = transform.first;
+		auto check = true;
 
-		auto & next_transform = next_frame->transforms_[key];
+		auto & next_frame = next_animation->frames_[next_animation->current_index_];
 
-		auto & new_transform = this->new_transform_.transforms_[key];
-
-		if(this->is_check_point_)
+		for (auto & transform : next_frame.transforms_)
 		{
-			new_transform = Linear(this->check_point_.transforms_[key], next_transform, this->progress_);
+			auto & key = transform.first;
+
+			auto have = std::find(parts_check.begin(), parts_check.end(), key);
+
+			if (have != parts_check.end()) continue;
+
+			parts_check.emplace_back(key);
+
+			auto & next_transform = transform.second;
+
+			auto model_transform = (*this->model_list_)[transform.first].transform();
+
+			AnimationTransform current_transform;
+			current_transform.position_ = model_transform->position();
+			current_transform.rotation_ = model_transform->rotation();
+			current_transform.scale_ = model_transform->scale();
+
+			auto new_transform = Completion(current_transform, next_transform, next_frame.speed_, check);
+
+			model_transform->set_position(new_transform.position_);
+			model_transform->set_rotation(new_transform.rotation_);
+			model_transform->set_scale(new_transform.scale_);
 		}
-		else
+
+		if (check)
 		{
-			new_transform = Linear(transform.second, next_transform, this->progress_);
-		}
+			next_animation->current_index_++;
 
-		auto now_transform = (*this->model_list_)[transform.first].transform();
-
-		now_transform->set_position(new_transform.position_);
-		now_transform->set_rotation(new_transform.rotation_);
-		now_transform->set_scale(new_transform.scale_);
-	}
-
-	this->progress_ += next_frame->speed_;
-
-	if (this->progress_ > 1.f)
-	{
-		this->progress_ -= 1.f;
-
-		this->is_check_point_ = false;
-
-		if (this->next_animation_ != this->current_animation_)
-		{
-			this->current_index_ = 0;
-			this->current_animation_ = this->next_animation_;
-		}
-		else
-		{
-			this->current_index_++;
+			if (next_animation->current_index_ >= next_animation->frames_.size())
+			{
+				next_animation->current_index_ = 0;
+				if (!next_animation->is_loop_)
+				{
+					next_animation = nullptr;
+				}
+			}
 		}
 	}
 }

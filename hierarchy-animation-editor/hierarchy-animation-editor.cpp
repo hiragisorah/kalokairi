@@ -337,6 +337,12 @@ void hierarchyanimationeditor::on_scale_z_valueChanged(double value)
 		GetData(ui.parts_list->currentRow()).scale.z = static_cast<float>(value);
 }
 
+void hierarchyanimationeditor::on_speed_valueChanged(double value)
+{
+	if (ui.animation_list->currentItem())
+		anim_data[ui.animation_list->currentRow()].speed[ui.anim_slider->value()] = value;
+}
+
 void hierarchyanimationeditor::on_anim_max_valueChanged(int value)
 {
 	ui.anim_slider->setMaximum(value - 1);
@@ -372,6 +378,8 @@ void hierarchyanimationeditor::on_anim_slider_valueChanged(int value)
 		ui.scale_x->setValue(static_cast<double>(GetData(ui.parts_list->currentRow()).scale.x));
 		ui.scale_y->setValue(static_cast<double>(GetData(ui.parts_list->currentRow()).scale.y));
 		ui.scale_z->setValue(static_cast<double>(GetData(ui.parts_list->currentRow()).scale.z));
+
+		ui.speed->setValue(static_cast<double>(anim_data[ui.animation_list->currentRow()].speed[ui.anim_slider->value()]));
 	}
 }
 
