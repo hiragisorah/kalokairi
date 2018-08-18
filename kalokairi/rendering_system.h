@@ -28,6 +28,7 @@ private:
 	unsigned int col_map_;
 	unsigned int pos_map_;
 	unsigned int nor_map_;
+	unsigned int dep_map_;
 
 	unsigned int dsv_;
 	unsigned int vp_;

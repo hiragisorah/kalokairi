@@ -1,6 +1,7 @@
 Texture2D color_tex : register(t0);
 Texture2D position_tex : register(t1);
 Texture2D normal_tex : register(t2);
+Texture2D depth_tex : register(t3);
 
 SamplerState own_sampler : register(s0);
 
@@ -28,48 +29,73 @@ VsOut VS(uint index : SV_VertexID)
     return output;
 }
 
+float peek(float x, float y)
+{
+    return depth_tex.Sample(own_sampler, float2(x, y)).r;
+}
+
+float peek(float2 uv)
+{
+    return depth_tex.Sample(own_sampler, uv).r;
+}
+
+static float dx = 0.001953125;
+static float dy = 0.001953125;
+
 PsOut PS(VsOut input)
 {
     PsOut output = (PsOut) 0;
     
+    // - GBuffer
     float4 color_ = color_tex.Sample(own_sampler, input.uv_);
     float4 position_ = position_tex.Sample(own_sampler, input.uv_);
     float4 normal_ = normal_tex.Sample(own_sampler, input.uv_);
+    float4 depth_ = depth_tex.Sample(own_sampler, input.uv_);
+    // GBuffer -
 
-    float3 g_eye = float3(0, 6, -6);
-
-    float3 eye_dir = normalize(g_eye);
+    // 陰影 
     float3 light_dir = normalize(float3(0.f, -10.f, 5.f));
 
     float dotL = dot(normal_.xyz, light_dir);
+    //
+
+    // - テカり
+    float3 g_eye = float3(0, 6, -6);
+    float3 eye_dir = normalize(g_eye);
+
     float dotE = dot(normal_.xyz, eye_dir);
-   
-   // アークコサインで内積の結果からラジアン角を計算する
+
     float angleL = acos(dotL);
     float angleE = acos(dotE);
-   
+
     float alpha = max(angleL, angleE);
     float beta = min(angleL, angleE);
-   
-   // 法線と垂直な平面へ射影したライトベクトル
+
     float3 al = light_dir - normal_.xyz * dotL;
-   // 法線と垂直な平面へ射影した視線ベクトル
     float3 ae = g_eye.xyz - normal_.xyz * dotE;
+
     float gamma = max(0.0f, dot(al, ae));
+    // テカり -
    
-    float g_fRoughness = 0.5f;
+    // - トゥーン（3値化?）
+    float l = max(0.0f, dotL);
 
-    float roughnessSquared = g_fRoughness * g_fRoughness;
-   
-   // 元の式では0.57ではなく0.33だが、相互反射成分がないために生じる不一致は、0.57を使用することによって部分的に補うことができるとか。
-   // 要するに簡易版ではこうするといいということだろ、きっと。
-    float A = 1.0f - 0.5f * (roughnessSquared / (roughnessSquared + 0.57f));
-    float B = 0.45f * (roughnessSquared / (roughnessSquared + 0.09f));
+    l = lerp(step(0.02f, l) * 0.5f, 0.7f, step(0.5, l)) + 0.2f + gamma;
+    l *= 0.9f;
+    // トゥーン（3値化?） - 
 
-   // max(0.0f, dotL) -> ランバート反射
-    float l = max(0.0f, dotL) * (A + B * gamma * sin(alpha) * tan(beta));
+    // -　アウトライン
+    float x = input.uv_.x;
+    float y = input.uv_.y;
+    
+    float b = peek(x, y);
+    float d = step(0.003f, abs(b - peek(x + dx, y))
+          + abs(b - peek(x, y + dy)));
 
-    output.color_ = (float4(1, 1, 1, 1) * l).bgra;
+    float4 line_color = float4(float3(1, 1, 1) * (1.0 - d), 1.0);
+    // outline -
+
+    output.color_ = color_ * l * line_color;
 
     return output;
 }

@@ -11,6 +11,7 @@ void RenderingSystem::Initialize(void)
 	this->col_map_ = graphics->CreateColorMap(graphics->width(), graphics->height());
 	this->pos_map_ = graphics->CreatePositionMap(graphics->width(), graphics->height());
 	this->nor_map_ = graphics->CreateNormalMap(graphics->width(), graphics->height());
+	this->dep_map_ = graphics->CreateNormalMap(graphics->width(), graphics->height());
 	
 	this->dsv_ = graphics->CreateDepthStencil(graphics->width(), graphics->height());
 	this->vp_ = graphics->CreateViewPort(graphics->width(), graphics->height());
@@ -22,8 +23,8 @@ void RenderingSystem::Initialize(void)
 
 void RenderingSystem::Begin(Seed::Graphics & graphics)
 {
-	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_ }, { this->dsv_ });
-	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_ }, this->dsv_);
+	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, { this->dsv_ });
+	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, this->dsv_);
 }
 
 void RenderingSystem::Render(Seed::Graphics & graphics)
@@ -40,7 +41,7 @@ void RenderingSystem::End(Seed::Graphics & graphics)
 
 	graphics.SetShader(this->shader_, nullptr);
 
-	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_ });
+	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ });
 
 	graphics.Run();
 }

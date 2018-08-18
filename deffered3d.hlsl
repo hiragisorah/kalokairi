@@ -43,6 +43,7 @@ struct PsOut
     float4 color_ : SV_Target0;
     float4 position_ : SV_Target1;
     float4 normal_ : SV_Target2;
+    float4 depth_ : SV_Target3;
 };
 
 VsOut VS(VsIn input)
@@ -64,13 +65,16 @@ PsOut PS(VsOut input)
 {
     PsOut output = (PsOut) 0;
 
-    output.color_ = float4(input.uv_, 1, 1);
+    output.color_ = 1;
     output.position_ = input.position_;
     output.normal_.xyz = normalize(mul(input.normal_.xyz, (float3x3) g_world));
+    float depth = input.sv_position_.z / input.sv_position_.w;
+    output.depth_.xyz = float3(depth, 0, 0);
 
     output.color_.a = 1;
     output.position_.a = 1;
     output.normal_.a = 1;
+    output.depth_.a = 1;
 
     return output;
 }
