@@ -42,11 +42,40 @@ public:
 	const unsigned int & height(void);
 
 private:
+	Microsoft::WRL::ComPtr<ID3D11Buffer> main_buffer_;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> model_buffer_;
+
+private:
 	ResourcePool<RenderTarget> render_target_pool_;
 	ResourcePool<DepthStencil> depth_stencil_pool_;
 	ResourcePool<ViewPort> view_port_pool_;
 	ResourcePool<Shader> shader_pool_;
 	ResourcePool<Geometry> geometry_pool_;
+
+public:
+	struct MainCB
+	{
+		MainCB(void)
+			: view_(DirectX::XMMatrixIdentity())
+			, projection_(DirectX::XMMatrixIdentity())
+			, eye_({ 0, 0, 0 })
+			, dir_light_({ 0, 0, 0 })
+		{}
+
+		DirectX::XMMATRIX view_;
+		DirectX::XMMATRIX projection_;
+		DirectX::XMFLOAT3A eye_;
+		DirectX::XMFLOAT3A dir_light_;
+	} main_cb_;
+
+	struct ModelCB
+	{
+		ModelCB(void)
+			: world_(DirectX::XMMatrixIdentity())
+		{}
+
+		DirectX::XMMATRIX world_;
+	} model_cb_;
 
 private:
 	const unsigned int LoadViewPort(std::unique_ptr<ViewPort> && view_port);
@@ -84,8 +113,16 @@ public:
 	void SetViewPort(const unsigned int & view_port);
 	void SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil);
 	void SetShader(const unsigned int & shader, void * constant_buffer);
+	void UpdateMainConstantBuffer(void);
+	void UpdateModelConstantBuffer(void);
 	void Draw(const unsigned int & key);
 	void DrawScreen(const std::vector<unsigned int>& render_targets);
+
+	void SetWorld(const DirectX::XMMATRIX & world);
+	void SetView(const DirectX::XMMATRIX & view);
+	void SetProjection(const DirectX::XMMATRIX & projection);
+	void SetEye(const DirectX::Vector3 & eye);
+	void SetDirectionLight(const DirectX::Vector3 & dir_light);
 };
 
 const unsigned int Seed::Graphics::CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size)
@@ -143,6 +180,16 @@ void Seed::Graphics::SetShader(const unsigned int & shader, void * constant_buff
 	this->impl_->SetShader(shader, constant_buffer);
 }
 
+void Seed::Graphics::UpdateMainConstantBuffer(void)
+{
+	this->impl_->UpdateMainConstantBuffer();
+}
+
+void Seed::Graphics::UpdateModelConstantBuffer(void)
+{
+	this->impl_->UpdateModelConstantBuffer();
+}
+
 void Seed::Graphics::Draw(const unsigned int & key)
 {
 	this->impl_->Draw(key);
@@ -151,6 +198,31 @@ void Seed::Graphics::Draw(const unsigned int & key)
 void Seed::Graphics::DrawScreen(const std::vector<unsigned int>& render_targets)
 {
 	this->impl_->DrawScreen(render_targets);
+}
+
+void Seed::Graphics::SetWorld(const DirectX::XMMATRIX & world)
+{
+	this->impl_->SetWorld(world);
+}
+
+void Seed::Graphics::SetView(const DirectX::XMMATRIX & view)
+{
+	this->impl_->SetView(view);
+}
+
+void Seed::Graphics::SetProjection(const DirectX::XMMATRIX & projection)
+{
+	this->impl_->SetProjection(projection);
+}
+
+void Seed::Graphics::SetEye(const DirectX::Vector3 & eye)
+{
+	this->impl_->SetEye(eye);
+}
+
+void Seed::Graphics::SetDirectionLight(const DirectX::Vector3 & dir_light)
+{
+	this->impl_->SetDirectionLight(dir_light);
 }
 
 Seed::Graphics::~Graphics(void)
@@ -288,18 +360,56 @@ void Seed::Graphics::Impl::Initialize(void)
 			feature_level, &this->device_context_);
 	}
 
-	D3D11_RASTERIZER_DESC desc = {};
+	{
+		D3D11_RASTERIZER_DESC desc = {};
 
-	desc.CullMode = D3D11_CULL_NONE;
-	desc.FillMode = D3D11_FILL_WIREFRAME;
-	desc.DepthClipEnable = true;
-	desc.MultisampleEnable = true;
+		desc.CullMode = D3D11_CULL_BACK;
+		desc.FillMode = D3D11_FILL_WIREFRAME;
+		desc.DepthClipEnable = true;
+		desc.MultisampleEnable = true;
 
-	device->CreateRasterizerState(&desc, this->wire_frame_.GetAddressOf());
+		device->CreateRasterizerState(&desc, this->wire_frame_.GetAddressOf());
 
-	desc.FillMode = D3D11_FILL_SOLID;
-	
-	device->CreateRasterizerState(&desc, this->ccw_.GetAddressOf());
+		desc.FillMode = D3D11_FILL_SOLID;
+
+		device->CreateRasterizerState(&desc, this->ccw_.GetAddressOf());
+	}
+
+	{
+		D3D11_BUFFER_DESC bd;
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bd.ByteWidth = sizeof(MainCB);
+		bd.CPUAccessFlags = 0;
+		bd.MiscFlags = 0;
+		bd.StructureByteStride = 0;
+		bd.Usage = D3D11_USAGE_DEFAULT;
+
+		device->CreateBuffer(&bd, nullptr, this->main_buffer_.GetAddressOf());
+	}
+
+	{
+		D3D11_BUFFER_DESC bd;
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bd.ByteWidth = sizeof(ModelCB);
+		bd.CPUAccessFlags = 0;
+		bd.MiscFlags = 0;
+		bd.StructureByteStride = 0;
+		bd.Usage = D3D11_USAGE_DEFAULT;
+
+		device->CreateBuffer(&bd, nullptr, this->model_buffer_.GetAddressOf());
+	}
+
+	this->device_context_->VSSetConstantBuffers(0, 1, this->main_buffer_.GetAddressOf());
+	this->device_context_->GSSetConstantBuffers(0, 1, this->main_buffer_.GetAddressOf());
+	this->device_context_->HSSetConstantBuffers(0, 1, this->main_buffer_.GetAddressOf());
+	this->device_context_->DSSetConstantBuffers(0, 1, this->main_buffer_.GetAddressOf());
+	this->device_context_->PSSetConstantBuffers(0, 1, this->main_buffer_.GetAddressOf());
+
+	this->device_context_->VSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
+	this->device_context_->GSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
+	this->device_context_->HSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
+	this->device_context_->DSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
+	this->device_context_->PSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
 }
 
 void Seed::Graphics::Impl::Run(void)
@@ -489,6 +599,16 @@ void Seed::Graphics::Impl::SetShader(const unsigned int & shader, void * constan
 	this->shader_pool_.Get(shader)->Setup(constant_buffer);
 }
 
+void Seed::Graphics::Impl::UpdateMainConstantBuffer(void)
+{
+	this->device_context_->UpdateSubresource(this->main_buffer_.Get(), 0, nullptr, &this->main_cb_, 0, 0);
+}
+
+void Seed::Graphics::Impl::UpdateModelConstantBuffer(void)
+{
+	this->device_context_->UpdateSubresource(this->model_buffer_.Get(), 0, nullptr, &this->model_cb_, 0, 0);
+}
+
 void Seed::Graphics::Impl::Draw(const unsigned int & key)
 {
 	this->geometry_pool_.Get(key)->Draw();
@@ -508,4 +628,29 @@ void Seed::Graphics::Impl::DrawScreen(const std::vector<unsigned int>& render_ta
 
 	this->device_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	this->device_context_->Draw(4, 0);
+}
+
+void Seed::Graphics::Impl::SetWorld(const DirectX::XMMATRIX & world)
+{
+	this->model_cb_.world_ = world;
+}
+
+void Seed::Graphics::Impl::SetView(const DirectX::XMMATRIX & view)
+{
+	this->main_cb_.view_ = view;
+}
+
+void Seed::Graphics::Impl::SetProjection(const DirectX::XMMATRIX & projection)
+{
+	this->main_cb_.projection_ = projection;
+}
+
+void Seed::Graphics::Impl::SetEye(const DirectX::Vector3 & eye)
+{
+	this->main_cb_.eye_ = { eye.x, eye.y, eye.z };
+}
+
+void Seed::Graphics::Impl::SetDirectionLight(const DirectX::Vector3 & dir_light)
+{
+	this->main_cb_.dir_light_ = { dir_light.x, dir_light.y, dir_light.z };
 }

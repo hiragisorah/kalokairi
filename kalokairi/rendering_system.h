@@ -21,7 +21,8 @@ private:
 	void Rendering(Seed::Graphics & graphics, HierarchyModel * const model);
 
 private:
-	unsigned int shader_;
+	unsigned int shader_backbuffer_;
+	unsigned int shader_deffered_;
 
 	unsigned int backbuffer_;
 
@@ -32,4 +33,10 @@ private:
 
 	unsigned int dsv_;
 	unsigned int vp_;
+
+private:
+	DirectX::XMMATRIX view_;
+	DirectX::XMMATRIX projection_;
+	DirectX::Vector3 eye_;
+	DirectX::Vector3 dir_light_;
 };

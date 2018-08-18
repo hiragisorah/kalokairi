@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "..\frame-work\SimpleMath.h"
+
 namespace Seed
 {
 	class Graphics
@@ -64,9 +66,17 @@ namespace Seed
 		void ClearTarget(const std::vector<unsigned int> & render_targets, const std::vector<unsigned int> & depth_stencil);
 		void SetViewPort(const unsigned int & view_port);
 		void SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil);
-		void SetShader(const unsigned int & shader, void * constant_buffer);
+		void SetShader(const unsigned int & shader, void * constant_buffer = nullptr);
+		void UpdateMainConstantBuffer(void);
+		void UpdateModelConstantBuffer(void);
 		void Draw(const unsigned int & key);
 		void DrawScreen(const std::vector<unsigned int> & render_targets);
+
+		void SetWorld(const DirectX::XMMATRIX & world);
+		void SetView(const DirectX::XMMATRIX & view);
+		void SetProjection(const DirectX::XMMATRIX & projection);
+		void SetEye(const DirectX::Vector3 & eye);
+		void SetDirectionLight(const DirectX::Vector3 & dir_light);
 
 	private:
 		// Private implementation.

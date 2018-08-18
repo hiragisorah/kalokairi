@@ -1,3 +1,5 @@
+#include "constant_buffer.hlsli"
+
 Texture2D color_tex : register(t0);
 Texture2D position_tex : register(t1);
 Texture2D normal_tex : register(t2);
@@ -39,8 +41,8 @@ float peek(float2 uv)
     return depth_tex.Sample(own_sampler, uv).r;
 }
 
-static float dx = 0.001953125;
-static float dy = 0.001953125;
+static float dx = 0.00195;
+static float dy = 0.00195;
 
 PsOut PS(VsOut input)
 {
@@ -54,13 +56,12 @@ PsOut PS(VsOut input)
     // GBuffer -
 
     // 陰影 
-    float3 light_dir = normalize(float3(0.f, -10.f, 5.f));
+    float3 light_dir = normalize(g_dir_light);
 
     float dotL = dot(normal_.xyz, light_dir);
     //
 
     // - テカり
-    float3 g_eye = float3(0, 6, -6);
     float3 eye_dir = normalize(g_eye);
 
     float dotE = dot(normal_.xyz, eye_dir);
@@ -81,7 +82,6 @@ PsOut PS(VsOut input)
     float l = max(0.0f, dotL);
 
     l = lerp(step(0.02f, l) * 0.5f, 0.7f, step(0.5, l)) + 0.2f + gamma;
-    l *= 0.9f;
     // トゥーン（3値化?） - 
 
     // -　アウトライン
@@ -92,10 +92,10 @@ PsOut PS(VsOut input)
     float d = step(0.003f, abs(b - peek(x + dx, y))
           + abs(b - peek(x, y + dy)));
 
-    float4 line_color = float4(float3(1, 1, 1) * (1.0 - d), 1.0);
+    float out_line = 1.0 - d;
     // outline -
 
-    output.color_ = color_ * l * line_color;
+    output.color_ = color_ * l * out_line;
 
     return output;
 }

@@ -17,8 +17,6 @@ void Renderer::Initialize(void)
 {
 	auto graphics = this->owner()->scene()->engine()->graphics();
 
-	auto shader_id = graphics->CreateShader("../deffered3d.hlsl");
-
 	this->ReadHierarchyFromFile(this->model_file_);
 
 	if (this->animation_file_ != "")
@@ -27,31 +25,12 @@ void Renderer::Initialize(void)
 
 		this->animation_->set_model_list(&this->model_list_);
 	}
-
-	for (auto & model_map : this->model_list_)
-	{
-		auto & model = model_map.second;
-
-		this->constant_buffer_[model_map.first].world_ = model.transform()->FinalMatrix();
-		this->constant_buffer_[model_map.first].view_ = DirectX::XMMatrixLookAtLH(DirectX::XMVectorSet(0, 5, -5, 0.f), DirectX::XMVectorZero(), DirectX::XMVectorSet(0, 1, 0, 0));
-		this->constant_buffer_[model_map.first].projection_ = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV4, static_cast<float>(graphics->width()) / static_cast<float>(graphics->height()), 0.3f, 1000.f);
-		this->constant_buffer_[model_map.first].eye_ = { 0, 5, -5 };
-
-		model.set_shader_id(shader_id);
-		model.set_constant_buffer(&this->constant_buffer_[model_map.first]);
-	}
 }
 
 void Renderer::Update(void)
 {
 	if(this->animation_file_ != "")
 		this->animation_->Update();
-
-	for (auto & model_map : this->model_list_)
-	{
-		auto & model = model_map.second;
-		this->constant_buffer_[model_map.first].world_ = model.transform()->FinalMatrix();
-	}
 }
 
 void Renderer::Always(void)

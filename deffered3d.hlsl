@@ -1,27 +1,8 @@
+#include "constant_buffer.hlsli"
+
 Texture2D tex : register(t0);
 
 SamplerState own_sampler : register(s0);
-
-cbuffer unique : register(b0)
-{
-    row_major matrix g_world : packoffset(c0);
-    row_major matrix g_view : packoffset(c4);
-    row_major matrix g_proj : packoffset(c8);
-    float3 g_eye : packoffset(c12);
-};
-
-//cbuffer camera : register(b1)
-//{
-//    row_major matrix g_v : packoffset(c0);
-//    row_major matrix g_p : packoffset(c4);
-
-//    float4 g_eye : packoffset(c8);
-//    float4 g_at : packoffset(c9);
-
-//    float2 g_view_port : packoffset(c10);
-
-//    float4 g_color : packoffset(c11);
-//};
 
 struct VsIn
 {

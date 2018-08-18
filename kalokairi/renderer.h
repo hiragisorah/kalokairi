@@ -18,9 +18,6 @@ private:
 	HierarchyModelList model_list_;
 	HierarchyAnimation * animation_;
 
-private:
-	std::unordered_map<int, MainBuffer> constant_buffer_;
-
 public:
 	void Initialize(void) override;
 	void Update(void) override;
