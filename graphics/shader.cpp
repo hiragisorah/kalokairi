@@ -64,8 +64,7 @@ std::unique_ptr<Seed::Shader> Seed::Shader::Create(const DeviceContext & device_
 
 void Seed::Shader::Setup(void * constant_buffer) const
 {
-	if(constant_buffer != nullptr)
-		this->impl_->Setup(constant_buffer);
+	this->impl_->Setup(constant_buffer);
 }
 
 Seed::Shader::Shader(const DeviceContext & device_context) noexcept(false)
@@ -86,12 +85,12 @@ void Seed::Shader::Impl::CreateInputLayoutAndConstantBufferFromShader(ID3DBlob *
 	reflector->GetDesc(&shader_desc);
 
 	auto cb = reflector->GetConstantBufferByName("unique");
-
+	
 	int size = 0;
-	D3D11_SHADER_BUFFER_DESC desc;
+	D3D11_SHADER_BUFFER_DESC desc = {};
 	cb->GetDesc(&desc);
 
-	for (unsigned int j = 0; j < desc.Variables; ++j)
+	for (unsigned int j = 0; desc.Name != nullptr && j < desc.Variables; ++j)
 	{
 		auto v = cb->GetVariableByIndex(j);
 		D3D11_SHADER_VARIABLE_DESC vdesc;
@@ -248,17 +247,19 @@ void Seed::Shader::Impl::Setup(void * constant_buffer) const
 {
 	this->device_context_->IASetInputLayout(this->input_layout_.Get());
 
-	this->device_context_->UpdateSubresource(this->constant_buffer_.Get(), 0, nullptr, constant_buffer, 0, 0);
+	if (this->constant_buffer_ && constant_buffer)
+	{
+		this->device_context_->UpdateSubresource(this->constant_buffer_.Get(), 0, nullptr, constant_buffer, 0, 0);
+		this->device_context_->VSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
+		this->device_context_->GSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
+		this->device_context_->HSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
+		this->device_context_->DSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
+		this->device_context_->PSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
+	}
 
 	this->device_context_->VSSetShader(this->vertex_shader_.Get(), nullptr, 0);
 	this->device_context_->GSSetShader(this->geometry_shader_.Get(), nullptr, 0);
 	this->device_context_->HSSetShader(this->hull_shader_.Get(), nullptr, 0);
 	this->device_context_->DSSetShader(this->domain_shader_.Get(), nullptr, 0);
 	this->device_context_->PSSetShader(this->pixel_shader_.Get(), nullptr, 0);
-
-	this->device_context_->VSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
-	this->device_context_->GSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
-	this->device_context_->HSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
-	this->device_context_->DSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
-	this->device_context_->PSSetConstantBuffers(0, 1, this->constant_buffer_.GetAddressOf());
 }

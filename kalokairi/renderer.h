@@ -8,14 +8,15 @@
 class Renderer : public Seed::Component
 {
 public:
-	Renderer(void);
+	Renderer(const std::string & model_file, const std::string & animation_file = "");
 
 private:
-	Transform * transform_;
-	HierarchyModelList model_list_;
-	HierarchyAnimation animation_;
+	std::string model_file_;
+	std::string animation_file_;
 
-	Animation root_animation_;
+private:
+	HierarchyModelList model_list_;
+	HierarchyAnimation * animation_;
 
 private:
 	std::unordered_map<int, MainBuffer> constant_buffer_;
@@ -32,4 +33,7 @@ public:
 
 public:
 	const int Find(const std::string & model_name);
+
+public:
+	HierarchyAnimation * const animation(void);
 };

@@ -5,19 +5,28 @@
 
 #include "..\QtGui\item.h"
 
-Renderer::Renderer(void)
-	: transform_(new Transform)
+Renderer::Renderer(const std::string & model_file, const std::string & animation_file)
+	: animation_(new HierarchyAnimation)
+	, model_file_(model_file)
+	, animation_file_(animation_file)
 {
+
 }
 
 void Renderer::Initialize(void)
 {
 	auto graphics = this->owner()->scene()->engine()->graphics();
-	
-	this->ReadHierarchyFromFile("stick_man_low.hmodel");
-	this->ReadHierarchyAnimationFromFile("human.hanim");
 
-	auto shader_id = graphics->CreateShader("../default3d.hlsl");
+	auto shader_id = graphics->CreateShader("../deffered3d.hlsl");
+
+	this->ReadHierarchyFromFile(this->model_file_);
+
+	if (this->animation_file_ != "")
+	{
+		this->ReadHierarchyAnimationFromFile(this->animation_file_);
+
+		this->animation_->set_model_list(&this->model_list_);
+	}
 
 	for (auto & model_map : this->model_list_)
 	{
@@ -31,45 +40,12 @@ void Renderer::Initialize(void)
 		model.set_shader_id(shader_id);
 		model.set_constant_buffer(&this->constant_buffer_[model_map.first]);
 	}
-
-	this->root_animation_.frames_.resize(1);
-
-	this->animation_.SetAnimation("idle", 1);
-	this->animation_.SetAnimation(&this->root_animation_, 0);
-
-	this->animation_.set_model_list(&this->model_list_);
 }
 
 void Renderer::Update(void)
 {
-	auto & transform = this->root_animation_.frames_[0].transforms_[0];
-
-	float move_side = static_cast<float>(Input::Press(Qt::Key_D)) - static_cast<float>(Input::Press(Qt::Key_A));
-	
-	float move_forward = static_cast<float>(Input::Press(Qt::Key_W)) - static_cast<float>(Input::Press(Qt::Key_S));
-
-	float rot_side = static_cast<float>(Input::Press(Qt::Key_Q)) - static_cast<float>(Input::Press(Qt::Key_E));
-
-	if (move_side || move_forward)
-	{
-		this->animation_.SetAnimation("walk", 1);
-	}
-	else
-	{
-		this->animation_.SetAnimation("idle", 1);
-	}
-
-	float move_speed = 0.005f;
-
-	this->transform_->RotateY(rot_side);
-	this->transform_->MoveSide(move_side * move_speed * 0.5f);
-	this->transform_->MoveForward(move_forward * move_speed);
-
-	transform.position_ = this->transform_->position();
-	transform.rotation_ = this->transform_->rotation();
-	transform.scale_ = this->transform_->scale();
-
-	this->animation_.Update();
+	if(this->animation_file_ != "")
+		this->animation_->Update();
 
 	for (auto & model_map : this->model_list_)
 	{
@@ -180,7 +156,7 @@ void Renderer::ReadHierarchyAnimationFromFile(const std::string & file_name)
 			}
 		}
 
-		this->animation_.set_animation(anim.name, animation);
+		this->animation_->set_animation(anim.name, animation);
 	}
 }
 
@@ -193,4 +169,9 @@ const int Renderer::Find(const std::string & model_name)
 	}
 
 	return -1;
+}
+
+HierarchyAnimation * const Renderer::animation(void)
+{
+	return this->animation_;
 }

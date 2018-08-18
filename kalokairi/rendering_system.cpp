@@ -5,18 +5,25 @@
 void RenderingSystem::Initialize(void)
 {
 	auto graphics = this->owner()->engine()->graphics();
-	this->rtv_ = graphics->CreateBackBuffer();
+	
+	this->backbuffer_ = graphics->CreateBackBuffer();
+	
+	this->col_map_ = graphics->CreateColorMap(graphics->width(), graphics->height());
+	this->pos_map_ = graphics->CreatePositionMap(graphics->width(), graphics->height());
+	this->nor_map_ = graphics->CreateNormalMap(graphics->width(), graphics->height());
+	
 	this->dsv_ = graphics->CreateDepthStencil(graphics->width(), graphics->height());
 	this->vp_ = graphics->CreateViewPort(graphics->width(), graphics->height());
 
-	graphics->ClearTarget({ this->rtv_ }, { this->dsv_ });
-	graphics->SetTarget({ this->rtv_ }, this->dsv_);
+	this->shader_ = graphics->CreateShader("../backbuffer3d.hlsl");
+
 	graphics->SetViewPort(this->vp_);
 }
 
 void RenderingSystem::Begin(Seed::Graphics & graphics)
 {
-	graphics.ClearTarget({ this->rtv_ }, { this->dsv_ });
+	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_ }, { this->dsv_ });
+	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_ }, this->dsv_);
 }
 
 void RenderingSystem::Render(Seed::Graphics & graphics)
@@ -29,6 +36,12 @@ void RenderingSystem::Render(Seed::Graphics & graphics)
 
 void RenderingSystem::End(Seed::Graphics & graphics)
 {
+	graphics.SetTarget({ this->backbuffer_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_, nullptr);
+
+	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_ });
+
 	graphics.Run();
 }
 

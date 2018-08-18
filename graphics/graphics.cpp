@@ -59,6 +59,9 @@ public:
 	const unsigned int CreateViewPort(const unsigned int & width, const unsigned int & height);
 		
 	const unsigned int CreateBackBuffer(void);
+	const unsigned int CreateColorMap(const unsigned int & width, const unsigned int & height);
+	const unsigned int CreatePositionMap(const unsigned int & width, const unsigned int & height);
+	const unsigned int CreateNormalMap(const unsigned int & width, const unsigned int & height);
 
 	const unsigned int CreateDepthStencil(const unsigned int & width, const unsigned int & height);
 
@@ -82,6 +85,7 @@ public:
 	void SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil);
 	void SetShader(const unsigned int & shader, void * constant_buffer);
 	void Draw(const unsigned int & key);
+	void DrawScreen(const std::vector<unsigned int>& render_targets);
 };
 
 const unsigned int Seed::Graphics::CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size)
@@ -142,6 +146,11 @@ void Seed::Graphics::SetShader(const unsigned int & shader, void * constant_buff
 void Seed::Graphics::Draw(const unsigned int & key)
 {
 	this->impl_->Draw(key);
+}
+
+void Seed::Graphics::DrawScreen(const std::vector<unsigned int>& render_targets)
+{
+	this->impl_->DrawScreen(render_targets);
 }
 
 Seed::Graphics::~Graphics(void)
@@ -227,6 +236,21 @@ const unsigned int Seed::Graphics::CreateBackBuffer(void)
 	return this->impl_->CreateBackBuffer();
 }
 
+const unsigned int Seed::Graphics::CreateColorMap(const unsigned int & width, const unsigned int & height)
+{
+	return this->impl_->CreateColorMap(width, height);
+}
+
+const unsigned int Seed::Graphics::CreatePositionMap(const unsigned int & width, const unsigned int & height)
+{
+	return this->impl_->CreatePositionMap(width, height);
+}
+
+const unsigned int Seed::Graphics::CreateNormalMap(const unsigned int & width, const unsigned int & height)
+{
+	return this->impl_->CreateNormalMap(width, height);
+}
+
 void Seed::Graphics::UnloadRenderTarget(const unsigned int & key)
 {
 	this->impl_->UnloadRenderTarget(key);
@@ -266,7 +290,7 @@ void Seed::Graphics::Impl::Initialize(void)
 
 	D3D11_RASTERIZER_DESC desc = {};
 
-	desc.CullMode = D3D11_CULL_BACK;
+	desc.CullMode = D3D11_CULL_NONE;
 	desc.FillMode = D3D11_FILL_WIREFRAME;
 	desc.DepthClipEnable = true;
 	desc.MultisampleEnable = true;
@@ -345,6 +369,21 @@ const unsigned int Seed::Graphics::Impl::CreateViewPort(const unsigned int & wid
 const unsigned int Seed::Graphics::Impl::CreateBackBuffer(void)
 {
 	return this->LoadRenderTarget(RenderTarget::BackBuffer(this->swap_chain_, this->device_context_));
+}
+
+const unsigned int Seed::Graphics::Impl::CreateColorMap(const unsigned int & width, const unsigned int & height)
+{
+	return this->LoadRenderTarget(RenderTarget::ColorMap(this->swap_chain_, this->device_context_, width, height));
+}
+
+const unsigned int Seed::Graphics::Impl::CreatePositionMap(const unsigned int & width, const unsigned int & height)
+{
+	return this->LoadRenderTarget(RenderTarget::PositionMap(this->swap_chain_, this->device_context_, width, height));
+}
+
+const unsigned int Seed::Graphics::Impl::CreateNormalMap(const unsigned int & width, const unsigned int & height)
+{
+	return this->LoadRenderTarget(RenderTarget::NormalMap(this->swap_chain_, this->device_context_, width, height));
 }
 
 const unsigned int Seed::Graphics::Impl::CreateDepthStencil(const unsigned int & width, const unsigned int & height)
@@ -453,4 +492,20 @@ void Seed::Graphics::Impl::SetShader(const unsigned int & shader, void * constan
 void Seed::Graphics::Impl::Draw(const unsigned int & key)
 {
 	this->geometry_pool_.Get(key)->Draw();
+}
+
+void Seed::Graphics::Impl::DrawScreen(const std::vector<unsigned int>& render_targets)
+{
+	for (int n = 0; n < render_targets.size(); ++n)
+	{
+		auto srv = this->render_target_pool_.Get(render_targets[n])->GetSRV();
+		this->device_context_->VSSetShaderResources(n, 1, &srv);
+		this->device_context_->GSSetShaderResources(n, 1, &srv);
+		this->device_context_->HSSetShaderResources(n, 1, &srv);
+		this->device_context_->DSSetShaderResources(n, 1, &srv);
+		this->device_context_->PSSetShaderResources(n, 1, &srv);
+	}
+
+	this->device_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	this->device_context_->Draw(4, 0);
 }

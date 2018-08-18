@@ -1,6 +1,7 @@
 #include "hierarchy-animation.h"
 
 HierarchyAnimation::HierarchyAnimation(void)
+	: model_list_(nullptr)
 {
 	for (auto & anim : this->next_animation_)
 		anim = nullptr;
@@ -32,6 +33,8 @@ void HierarchyAnimation::SetAnimation(Animation * const animation, const int & p
 
 void HierarchyAnimation::Update(void)
 {
+	if (this->model_list_ == nullptr) return;
+
 	std::vector<int> parts_check;
 
 	for (auto & next_animation : this->next_animation_)

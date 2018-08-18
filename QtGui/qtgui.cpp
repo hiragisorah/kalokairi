@@ -25,22 +25,26 @@ QtGui::QtGui(QWidget *parent)
 	//box = graphics.CreatePlane(10, 10, { 0.5f, 0.5f });
 	//box = graphics.CreateBox();
 	//box = graphics.CreateSphere();
+	shader2 = graphics.CreateShader("../backbuffer3d.hlsl");
 	shader = graphics.CreateShader("../default3d.hlsl");
 
 	wvp.world = DirectX::XMMatrixIdentity();
-	wvp.view = DirectX::XMMatrixLookAtLH(DirectX::XMVectorSet(0, 0, 6, 0.f), DirectX::XMVectorZero(), DirectX::XMVectorSet(0, 1, 0, 0));
+	wvp.view = DirectX::XMMatrixLookAtLH(DirectX::XMVectorSet(0, 6, -6, 0.f), DirectX::XMVectorZero(), DirectX::XMVectorSet(0, 1, 0, 0));
 	//wvp.view = DirectX::XMMatrixRotationRollPitchYaw(25, -135, 0) * DirectX::XMMatrixTranslation(6, 4, 6);
 	wvp.projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV4, static_cast<float>(width) / static_cast<float>(height), 0.3f, 1000.f);
-	wvp.eye = { 0, 0, 6 };
+	wvp.eye = { 0, 6, -6 };
 	graphics.ClearTarget({ rtv }, { dsv });
 	graphics.SetTarget({ rtv }, { dsv });
 	graphics.SetViewPort(vp);
-	graphics.SetShader(shader, &wvp);
 }
 
 void QtGui::paintEvent(QPaintEvent * ev)
 {
 	graphics.ClearTarget({ rtv }, { dsv });
+
+	graphics.SetShader(shader2, nullptr);
+
+	graphics.DrawScreen({});
 
 	for (int i = 0; i < ui.parts_list->count(); ++i)
 	{

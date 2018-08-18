@@ -32,7 +32,7 @@ namespace Seed
 			component->set_owner(this);
 			component->Initialize();
 		}
-		template<class _Component> _Component * const Component(void) const
+		template<class _Component> _Component * const Component(void)
 		{
 			auto & component = this->components_[typeid(_Component)];
 			return static_cast<_Component*>(component);

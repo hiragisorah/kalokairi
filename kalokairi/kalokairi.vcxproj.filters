@@ -72,6 +72,15 @@
     <ClCompile Include="..\QtGui\item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="player_movement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="kalokairi.h">
@@ -110,8 +119,28 @@
     <ClInclude Include="hierarchy-animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="player_movement.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="stage.h">
+      <Filter>Header Files\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="screen.h">
+      <Filter>Header Files\entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\default3d.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="..\deffered3d.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="..\backbuffer3d.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

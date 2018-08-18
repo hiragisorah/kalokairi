@@ -113,6 +113,7 @@ private:
 	unsigned int dsv;
 	unsigned int vp;
 	unsigned int shader;
+	unsigned int shader2;
 
 private:
 	void UpdatePrimitive(int row);

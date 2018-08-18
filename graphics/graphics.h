@@ -37,6 +37,9 @@ namespace Seed
 
 		// - RenderTarget
 		const unsigned int CreateBackBuffer(void);
+		const unsigned int CreateColorMap(const unsigned int & width, const unsigned int & height);
+		const unsigned int CreatePositionMap(const unsigned int & width, const unsigned int & height);
+		const unsigned int CreateNormalMap(const unsigned int & width, const unsigned int & height);
 		void UnloadRenderTarget(const unsigned int & key);
 
 		// - DepthStencil
@@ -63,6 +66,7 @@ namespace Seed
 		void SetTarget(const std::vector<unsigned int> & render_targets, const unsigned int & depth_stencil);
 		void SetShader(const unsigned int & shader, void * constant_buffer);
 		void Draw(const unsigned int & key);
+		void DrawScreen(const std::vector<unsigned int> & render_targets);
 
 	private:
 		// Private implementation.

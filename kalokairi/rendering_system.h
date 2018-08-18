@@ -21,7 +21,14 @@ private:
 	void Rendering(Seed::Graphics & graphics, HierarchyModel * const model);
 
 private:
-	unsigned int rtv_;
+	unsigned int shader_;
+
+	unsigned int backbuffer_;
+
+	unsigned int col_map_;
+	unsigned int pos_map_;
+	unsigned int nor_map_;
+
 	unsigned int dsv_;
 	unsigned int vp_;
 };

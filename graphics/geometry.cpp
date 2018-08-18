@@ -50,6 +50,16 @@ void ReverseWinding(Seed::IndexCollection & indices, Seed::VertexCollection & ve
 	}
 }
 
+inline void InvertNormals(Seed::VertexCollection& vertices)
+{
+	for (auto it = vertices.begin(); it != vertices.end(); ++it)
+	{
+		it->normal_.x = -it->normal_.x;
+		it->normal_.y = -it->normal_.y;
+		it->normal_.z = -it->normal_.z;
+	}
+}
+
 unsigned int Reverse(unsigned int x, unsigned int y, unsigned int div_x)
 {
 	return x % (div_x + 1) + y * (div_x + 1);
@@ -92,6 +102,8 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Plane(const DeviceContext & devi
 			indices.emplace_back(v2to1(i + 1, n + 1, div_x));
 		}
 	}
+
+	InvertNormals(vertices);
 
 	geometry->impl_->Initialize(indices, vertices);
 
@@ -171,6 +183,8 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Box(const DeviceContext& device_
 
 	ReverseWinding(indices, vertices);
 
+	InvertNormals(vertices);
+
 	geometry->impl_->Initialize(indices, vertices);
 
 	geometry->impl_->set_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -247,6 +261,8 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Sphere(const DeviceContext& devi
 	}
 
 	ReverseWinding(indices, vertices);
+
+	InvertNormals(vertices);
 
 	geometry->impl_->Initialize(indices, vertices);
 
@@ -574,6 +590,8 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::GeoSphere(const DeviceContext& d
 
 	ReverseWinding(indices, vertices);
 
+	InvertNormals(vertices);
+
 	geometry->impl_->Initialize(indices, vertices);
 
 	geometry->impl_->set_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -663,6 +681,8 @@ std::unique_ptr<Seed::Geometry> Seed::Geometry::Capsule(const DeviceContext & de
 	}
 
 	ReverseWinding(indices, vertices);
+
+	InvertNormals(vertices);
 
 	geometry->impl_->Initialize(indices, vertices);
 
