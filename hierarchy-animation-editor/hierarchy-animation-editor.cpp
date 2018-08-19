@@ -32,22 +32,26 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 
 	graphics.Initialize(handle, width, height);
 
-	rtv = graphics.CreateBackBuffer();
-	dsv = graphics.CreateDepthStencil(width, height);
-	vp = graphics.CreateViewPort(width, height);
-	//box = graphics.CreatePlane(10, 10, { 0.5f, 0.5f });
-	//box = graphics.CreateBox();
-	//box = graphics.CreateSphere();
-	shader = graphics.CreateShader("../default3d.hlsl");
+	this->dir_light_ = DirectX::Vector3(0, -100, 50);
 
-	wvp.world = DirectX::XMMatrixIdentity();
-	wvp.view = DirectX::XMMatrixLookAtLH(DirectX::XMVectorSet(0, 5.f, -5.f, 0.f), DirectX::XMVectorZero(), DirectX::XMVectorSet(0, 1, 0, 0));
-	wvp.projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV4, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.f);
+	this->backbuffer_ = graphics.CreateBackBuffer();
 
-	graphics.ClearTarget({ rtv }, { dsv });
-	graphics.SetTarget({ rtv }, { dsv });
-	graphics.SetViewPort(vp);
-	graphics.SetShader(shader, &wvp);
+	this->col_map_ = graphics.CreateColorMap(graphics.width(), graphics.height());
+	this->pos_map_ = graphics.CreatePositionMap(graphics.width(), graphics.height());
+	this->nor_map_ = graphics.CreateNormalMap(graphics.width(), graphics.height());
+	this->dep_map_ = graphics.CreateNormalMap(graphics.width(), graphics.height());
+
+	this->dsv_ = graphics.CreateDepthStencil(graphics.width(), graphics.height());
+	this->vp_ = graphics.CreateViewPort(graphics.width(), graphics.height());
+
+	this->shader_backbuffer_ = graphics.CreateShader("../backbuffer3d.hlsl");
+	this->shader_deffered_ = graphics.CreateShader("../deffered3d.hlsl");
+
+	graphics.SetEye(DirectX::Vector3(0, 5, -5));
+	graphics.SetView(DirectX::Matrix::CreateLookAt(DirectX::Vector3(0, 5, -5), DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0)));
+	graphics.SetProjection(DirectX::Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PIDIV4,
+		static_cast<float>(graphics.width()) / static_cast<float>(graphics.height()), 0.3f, 1000.f));
+	graphics.SetViewPort(this->vp_);
 }
 
 void hierarchyanimationeditor::paintEvent(QPaintEvent * ev)
@@ -128,7 +132,16 @@ void hierarchyanimationeditor::Update(void)
 			play_data[frame.first] = Linear(frame.second, anim.frames[(value + 1) % anim_cnt][frame.first], current_data - static_cast<int>(current_data));
 		}
 	}
-	graphics.ClearTarget({ rtv }, { dsv });
+	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, { this->dsv_ });
+	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, this->dsv_);
+
+	graphics.SetDirectionLight(this->dir_light_);
+
+	graphics.SetShader(this->shader_deffered_);
+
+	graphics.UpdateMainConstantBuffer();
+
+	graphics.EnableWireFrame(this->wire_frame_);
 
 	if (ui.animation_list->currentItem() != nullptr)
 	{
@@ -170,14 +183,22 @@ void hierarchyanimationeditor::Update(void)
 					parent = p.parent;
 				}
 
-				wvp.world = offset * world;
+				graphics.SetWorld(offset * world);
 
-				graphics.SetShader(shader, &wvp);
+				graphics.UpdateModelConstantBuffer();
 
 				graphics.Draw(item.primitive_id);
 			}
 		}
 	}
+
+	graphics.EnableWireFrame(false);
+
+	graphics.SetTarget({ this->backbuffer_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_backbuffer_);
+
+	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ });
 
 	graphics.Run();
 }
@@ -385,7 +406,7 @@ void hierarchyanimationeditor::on_anim_slider_valueChanged(int value)
 
 void hierarchyanimationeditor::on_wire_mode_check_toggled(bool toggle)
 {
-	graphics.EnableWireFrame(toggle);
+	this->wire_frame_ = toggle;
 }
 
 void hierarchyanimationeditor::on_loop_check_toggled(bool toggle)

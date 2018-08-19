@@ -39,40 +39,25 @@ static AnimationTransform Linear(AnimationTransform & a, AnimationTransform & b,
 	return ret;
 }
 
-constexpr float default_distance = 10.f;
-constexpr float default_rotation = 50.f;
-constexpr float default_scale = 10.f;
-
-static AnimationTransform Completion(const AnimationTransform & a, const AnimationTransform & b, const float & speed, bool & check)
+static AnimationTransform Completion(const AnimationTransform & a, const AnimationTransform & b, const float & progress)
 {
 	AnimationTransform ret;
 
-	auto dist = DirectX::Vector3::Distance(a.position_, b.position_);
-	auto diff = b.position_ - a.position_;
+	ret.position_ = DirectX::Vector3::Lerp(a.position_, b.position_, progress);
+	ret.rotation_ = DirectX::Vector3::Lerp(a.rotation_, b.rotation_, progress);
+	ret.scale_ = DirectX::Vector3::Lerp(a.scale_, b.scale_, progress);
 
-	auto x = std::min((default_distance * speed) / dist, 1.f);
+	return ret;
+}
 
-	ret.position_ = a.position_ + diff * x;
 
-	if (fabsf(dist) > 0.001f) check = false;
+static AnimationTransform Completion(const Transform & a, const Transform & b, const float & progress)
+{
+	AnimationTransform ret;
 
-	dist = DirectX::Vector3::Distance(a.rotation_, b.rotation_);
-	diff = b.rotation_ - a.rotation_;
-
-	x = std::min((default_rotation * speed) / dist, 1.f);
-
-	ret.rotation_ = a.rotation_ + diff * x;
-
-	if (fabsf(dist) > 0.001f) check = false;
-
-	dist = DirectX::Vector3::Distance(a.scale_, b.scale_);
-	diff = b.scale_ - a.scale_;
-
-	x = std::min((default_scale * speed) / dist, 1.f);
-
-	ret.scale_ = a.scale_ + diff * x;
-
-	if (fabsf(dist) > 0.001f) check = false;
+	ret.position_ = DirectX::Vector3::Lerp(a.position(), b.position(), progress);
+	ret.rotation_ = DirectX::Vector3::Lerp(a.rotation(), b.rotation(), progress);
+	ret.scale_ = DirectX::Vector3::Lerp(a.scale(), b.scale(), progress);
 
 	return ret;
 }
@@ -91,13 +76,14 @@ struct AnimationFrame
 struct Animation
 {
 	Animation(void)
-		: current_index_(0)
-		, is_loop_(true)
+		: is_loop_(true)
+		, progress_(0)
 	{}
 
 	std::vector<AnimationFrame> frames_;
-	int current_index_;
 	bool is_loop_;
+
+	float progress_;
 };
 
 class HierarchyAnimation
@@ -115,14 +101,22 @@ private:
 	std::unordered_map<std::string, Animation> animations_;
 
 public:
+	Animation * const animations(const std::string & animation_name);
+
+public:
 	void set_animation(const std::string & animation_name, const Animation & animation);
 
 public:
-	void SetAnimation(const std::string & animation_name, const int & priority);
-	void SetAnimation(Animation * const animation, const int & priority);
+	void SetAnimation(const std::string & animation_name, const int & priority, const float & start_progress = 0.f);
+	void SetAnimation(Animation * const animation, const int & priority, const float & start_progress = 0.f);
+	void SetIntercept(const int & parts, Transform * transform, const float & force);
+	void RemoveAnimation(const int & priority);
+	void RemoveIntercept(const int & parts);
 
 private:
 	Animation * next_animation_[10];
+	std::unordered_map<int, Transform*> intercept_;
+	std::unordered_map<int, float> force_;
 
 public:
 	void Update(void);

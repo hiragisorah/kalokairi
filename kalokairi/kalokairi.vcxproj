@@ -114,6 +114,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\QtGui\item.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="hierarchy-animation.cpp" />
     <ClCompile Include="kalokairi.cpp" />
     <ClCompile Include="main.cpp" />
@@ -121,6 +122,7 @@
     <ClCompile Include="hierarchy-model.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_movement.cpp" />
+    <ClCompile Include="player_system.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="rendering_system.cpp" />
     <ClCompile Include="screen.cpp" />
@@ -145,11 +147,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="hierarchy-animation.h" />
     <ClInclude Include="main_scene.h" />
     <ClInclude Include="hierarchy-model.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="player_movement.h" />
+    <ClInclude Include="player_system.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="rendering_system.h" />
     <ClInclude Include="screen.h" />

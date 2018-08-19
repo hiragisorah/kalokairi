@@ -4,6 +4,6 @@
 
 void Player::Initialize(void)
 {
-	this->AddComponent<Renderer>("stick_man_low.hmodel", "human.hanim");
+	this->AddComponent<Renderer>("stick_man_low2.hmodel", "human2.hanim");
 	this->AddComponent<PlayerMovement>();
 }

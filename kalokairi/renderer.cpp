@@ -59,6 +59,8 @@ void Renderer::ReadHierarchyFromFile(const std::string & file_name)
 	cereal::BinaryInputArchive in(is);
 	in(cnt, items);
 
+	is.close();
+
 	for (auto & item : items)
 	{
 		auto & model = this->model_list_[item.second.self];

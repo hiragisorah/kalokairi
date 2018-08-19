@@ -48,6 +48,7 @@ PsOut PS(VsOut input)
 
     output.color_ = 1;
     output.position_ = input.position_;
+    //output.normal_ = input.normal_;
     output.normal_.xyz = normalize(mul(input.normal_.xyz, (float3x3) g_world));
     float depth = input.sv_position_.z / input.sv_position_.w;
     output.depth_.xyz = float3(depth, 0, 0);

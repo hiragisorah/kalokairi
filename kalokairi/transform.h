@@ -54,7 +54,7 @@ public:
 	void RotateY(const float & speed);
 
 public:
-	DirectX::XMMATRIX TransformMatrix(void);
-	DirectX::XMMATRIX OffsetMatrix(void);
-	DirectX::XMMATRIX FinalMatrix(void);
+	DirectX::Matrix TransformMatrix(void);
+	DirectX::Matrix OffsetMatrix(void);
+	DirectX::Matrix FinalMatrix(void);
 };

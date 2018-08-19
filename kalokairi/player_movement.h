@@ -18,7 +18,8 @@ public:
 
 private:
 	Transform * transform_;
-	Animation * root_animation_;
 	Renderer * renderer_;
 
+public:
+	Transform * const transform(void);
 };

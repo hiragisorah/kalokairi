@@ -6,10 +6,7 @@ void RenderingSystem::Initialize(void)
 {
 	auto graphics = this->owner()->engine()->graphics();
 
-	this->view_ = DirectX::XMMatrixLookAtLH(DirectX::XMVectorSet(0, 6, -6, 0.f), DirectX::XMVectorZero(), DirectX::XMVectorSet(0, 1, 0, 0));
-	this->projection_ = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV4, static_cast<float>(graphics->width()) / static_cast<float>(graphics->height()), 0.3f, 1000.f);
-	this->eye_ = DirectX::Vector3(0, 6, -6);
-	this->dir_light_ = DirectX::Vector3(0, -10, 5);
+	this->dir_light_ = DirectX::Vector3(0, -100, 50);
 
 	this->backbuffer_ = graphics->CreateBackBuffer();
 	
@@ -32,18 +29,15 @@ void RenderingSystem::Begin(Seed::Graphics & graphics)
 	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, { this->dsv_ });
 	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, this->dsv_);
 
-	graphics.SetView(this->view_);
-	graphics.SetProjection(this->projection_);
-	graphics.SetEye(this->eye_);
 	graphics.SetDirectionLight(this->dir_light_);
 	
-	graphics.UpdateMainConstantBuffer();
-
 	graphics.SetShader(this->shader_deffered_);
 }
 
 void RenderingSystem::Render(Seed::Graphics & graphics)
 {
+	graphics.UpdateMainConstantBuffer();
+
 	for (auto & model : this->model_list_)
 		this->Rendering(graphics, model);
 
@@ -63,7 +57,8 @@ void RenderingSystem::End(Seed::Graphics & graphics)
 
 void RenderingSystem::AddModel(HierarchyModel * const model)
 {
-	this->model_list_.emplace_back(model);
+	if(model->primitive_id() != -1)
+		this->model_list_.emplace_back(model);
 }
 
 void RenderingSystem::Rendering(Seed::Graphics & graphics, HierarchyModel * const model)

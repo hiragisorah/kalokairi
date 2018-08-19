@@ -27,15 +27,6 @@ protected:
 	void paintEvent(QPaintEvent * ev);
 
 private:
-	struct WVP
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-		DirectX::XMFLOAT3A eye;
-	} wvp;
-
-private:
 	std::unordered_map<int, ItemData> main_data;
 	std::vector<int> item_no;
 
@@ -109,11 +100,23 @@ private slots:
 	void actionExport(void);
 
 private:
-	unsigned int rtv;
-	unsigned int dsv;
-	unsigned int vp;
-	unsigned int shader;
-	unsigned int shader2;
+	unsigned int shader_backbuffer_;
+	unsigned int shader_deffered_;
+
+	unsigned int backbuffer_;
+
+	unsigned int col_map_;
+	unsigned int pos_map_;
+	unsigned int nor_map_;
+	unsigned int dep_map_;
+
+	unsigned int dsv_;
+	unsigned int vp_;
+
+	bool wire_frame_;
+
+private:
+	DirectX::Vector3 dir_light_;
 
 private:
 	void UpdatePrimitive(int row);

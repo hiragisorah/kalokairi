@@ -104,23 +104,23 @@ void Transform::RotateY(const float & speed)
 	this->rotation_.y += speed;
 }
 
-DirectX::XMMATRIX Transform::TransformMatrix(void)
+DirectX::Matrix Transform::TransformMatrix(void)
 {
-	return DirectX::XMMatrixScaling(this->scale_.x, this->scale_.y, this->scale_.z)
-		* DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(this->rotation_.x), DirectX::XMConvertToRadians(this->rotation_.y), DirectX::XMConvertToRadians(this->rotation_.z))
-		* DirectX::XMMatrixTranslation(this->position_.x, this->position_.y, this->position_.z);
+	return DirectX::Matrix::CreateScale(this->scale_)
+		* DirectX::Matrix::CreateFromYawPitchRoll(DirectX::XMConvertToRadians(this->rotation_.y), DirectX::XMConvertToRadians(this->rotation_.x), DirectX::XMConvertToRadians(this->rotation_.z))
+		* DirectX::Matrix::CreateTranslation(this->position_);
 }
 
-DirectX::XMMATRIX Transform::OffsetMatrix(void)
+DirectX::Matrix Transform::OffsetMatrix(void)
 {
-	return DirectX::XMMatrixScaling(this->offset_scale_.x, this->offset_scale_.y, this->offset_scale_.z)
-		* DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(this->offset_rotation_.x), DirectX::XMConvertToRadians(this->offset_rotation_.y), DirectX::XMConvertToRadians(this->offset_rotation_.z))
-		* DirectX::XMMatrixTranslation(this->offset_position_.x, this->offset_position_.y, this->offset_position_.z);
+	return DirectX::Matrix::CreateScale(this->offset_scale_)
+		* DirectX::Matrix::CreateFromYawPitchRoll(DirectX::XMConvertToRadians(this->offset_rotation_.y), DirectX::XMConvertToRadians(this->offset_rotation_.x), DirectX::XMConvertToRadians(this->offset_rotation_.z))
+		* DirectX::Matrix::CreateTranslation(this->offset_position_);
 }
 
-DirectX::XMMATRIX Transform::FinalMatrix(void)
+DirectX::Matrix Transform::FinalMatrix(void)
 {
-	DirectX::XMMATRIX ret;
+	DirectX::Matrix ret;
 
 	ret = this->OffsetMatrix() * this->TransformMatrix();
 

@@ -210,10 +210,23 @@ private slots:
 	void actionExport2(void);
 
 private:
-	unsigned int rtv;
-	unsigned int dsv;
-	unsigned int vp;
-	unsigned int shader;
+	unsigned int shader_backbuffer_;
+	unsigned int shader_deffered_;
+
+	unsigned int backbuffer_;
+
+	unsigned int col_map_;
+	unsigned int pos_map_;
+	unsigned int nor_map_;
+	unsigned int dep_map_;
+
+	unsigned int dsv_;
+	unsigned int vp_;
+
+	bool wire_frame_;
+
+private:
+	DirectX::Vector3 dir_light_;
 
 private:
 	void UpdatePrimitive(void);

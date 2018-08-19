@@ -35,8 +35,5 @@ private:
 	unsigned int vp_;
 
 private:
-	DirectX::XMMATRIX view_;
-	DirectX::XMMATRIX projection_;
-	DirectX::Vector3 eye_;
 	DirectX::Vector3 dir_light_;
 };

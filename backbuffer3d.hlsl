@@ -41,8 +41,8 @@ float peek(float2 uv)
     return depth_tex.Sample(own_sampler, uv).r;
 }
 
-static float dx = 0.00195;
-static float dy = 0.00195;
+static float dx = 0.0015;
+static float dy = 0.0015;
 
 PsOut PS(VsOut input)
 {
@@ -56,13 +56,13 @@ PsOut PS(VsOut input)
     // GBuffer -
 
     // 陰影 
-    float3 light_dir = normalize(g_dir_light);
+    float3 light_dir = normalize(g_dir_light - position_.xyz);
 
     float dotL = dot(normal_.xyz, light_dir);
     //
 
     // - テカり
-    float3 eye_dir = normalize(g_eye);
+    float3 eye_dir = normalize(g_eye - position_.xyz);
 
     float dotE = dot(normal_.xyz, eye_dir);
 
@@ -73,23 +73,25 @@ PsOut PS(VsOut input)
     float beta = min(angleL, angleE);
 
     float3 al = light_dir - normal_.xyz * dotL;
-    float3 ae = g_eye.xyz - normal_.xyz * dotE;
+    float3 ae = eye_dir - normal_.xyz * dotE;
 
     float gamma = max(0.0f, dot(al, ae));
     // テカり -
-   
+
+
     // - トゥーン（3値化?）
     float l = max(0.0f, dotL);
 
-    l = lerp(step(0.02f, l) * 0.5f, 0.7f, step(0.5, l)) + 0.2f + gamma;
-    // トゥーン（3値化?） - 
+    l = min(lerp(step(0.03f, l) * 0.3f, 0.4f, step(0.5, l)) + 0.5f + gamma, 1.0);
 
+    // トゥーン（3値化?） - 
+    
     // -　アウトライン
     float x = input.uv_.x;
     float y = input.uv_.y;
     
     float b = peek(x, y);
-    float d = step(0.003f, abs(b - peek(x + dx, y))
+    float d = step(0.01f, abs(b - peek(x + dx, y))
           + abs(b - peek(x, y + dy)));
 
     float out_line = 1.0 - d;
