@@ -29,6 +29,7 @@ struct PsOut
 
 VsOut VS(VsIn input)
 {
+
     VsOut output = (VsOut) 0;
 
     matrix wvp = mul(g_world, mul(g_view, g_proj));

@@ -20,27 +20,34 @@ void PlayerMovement::Initialize(void)
 
 void PlayerMovement::Update(void)
 {
-	auto anim_index = static_cast<int>(this->renderer_->animation()->animations("walk")->progress_);
+	auto walk_index = static_cast<int>(this->renderer_->animation()->animations("walk")->progress_);
+	auto run_index = static_cast<int>(this->renderer_->animation()->animations("run")->progress_);
 
-	float move_side = static_cast<float>(Input::Press(Qt::Key_D)) - static_cast<float>(Input::Press(Qt::Key_A));
-
-	float move_forward = static_cast<float>(Input::Press(Qt::Key_W)) - static_cast<float>(Input::Press(Qt::Key_S));
+	float move_forward = static_cast<float>(Input::Press(Qt::Key_W)) - static_cast<float>(Input::Press(Qt::Key_S)) * 0.5f;
 
 	float rot_side = static_cast<float>(Input::Press(Qt::Key_E)) - static_cast<float>(Input::Press(Qt::Key_Q));
 
-	if (move_side || move_forward)
+	float move_speed = 0.03f;
+
+	if (move_forward)
 	{
-		this->renderer_->animation()->SetAnimation("walk", 1);
+		if (Input::Press(Qt::Key_Shift))
+		{
+			this->renderer_->animation()->SetAnimation("run", 1);
+			move_speed *= (static_cast<float>(run_index % 2 == 1) + 1) * 3.f;
+		}
+		else
+		{
+			this->renderer_->animation()->SetAnimation("walk", 1);
+			move_speed *= static_cast<float>(walk_index % 2 == 0);
+		}
 	}
 	else
 	{
 		this->renderer_->animation()->SetAnimation("idle", 1);
 	}
 
-	float move_speed = 0.03f * static_cast<float>(anim_index % 2 == 0);
-
 	this->transform_->RotateY(rot_side);
-	this->transform_->MoveSide(move_side * move_speed * 0.5f);
 	this->transform_->MoveForward(move_forward * move_speed);
 }
 

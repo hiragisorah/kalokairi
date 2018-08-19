@@ -53,6 +53,8 @@ public:
     QListWidget *animation_list;
     QPushButton *add_button;
     QPushButton *delete_button;
+    QPushButton *copy;
+    QPushButton *paste;
     QGroupBox *transform_group;
     QGroupBox *groupBox_4;
     QWidget *horizontalLayoutWidget;
@@ -95,6 +97,15 @@ public:
     QPushButton *play_button;
     QPushButton *pause_button;
     QCheckBox *loop_check;
+    QGroupBox *groupBox_7;
+    QWidget *horizontalLayoutWidget_8;
+    QHBoxLayout *horizontalLayout_8;
+    QLabel *label_16;
+    QDoubleSpinBox *eye_x;
+    QLabel *label_17;
+    QDoubleSpinBox *eye_y;
+    QLabel *label_18;
+    QDoubleSpinBox *eye_z;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuAnimation;
@@ -105,7 +116,7 @@ public:
     {
         if (hierarchyanimationeditorClass->objectName().isEmpty())
             hierarchyanimationeditorClass->setObjectName(QStringLiteral("hierarchyanimationeditorClass"));
-        hierarchyanimationeditorClass->resize(1366, 781);
+        hierarchyanimationeditorClass->resize(1366, 823);
         actionImport = new QAction(hierarchyanimationeditorClass);
         actionImport->setObjectName(QStringLiteral("actionImport"));
         actionExport = new QAction(hierarchyanimationeditorClass);
@@ -128,7 +139,7 @@ public:
         parts_list->setGeometry(QRect(10, 30, 291, 281));
         wire_mode_check = new QCheckBox(centralWidget);
         wire_mode_check->setObjectName(QStringLiteral("wire_mode_check"));
-        wire_mode_check->setGeometry(QRect(30, 600, 141, 31));
+        wire_mode_check->setGeometry(QRect(30, 680, 141, 31));
         QFont font1;
         font1.setFamily(QString::fromUtf8("\343\203\241\343\202\244\343\203\252\343\202\252"));
         font1.setPointSize(12);
@@ -155,7 +166,7 @@ public:
         anim_slider->setTickInterval(0);
         horizontalLayoutWidget_3 = new QWidget(centralWidget);
         horizontalLayoutWidget_3->setObjectName(QStringLiteral("horizontalLayoutWidget_3"));
-        horizontalLayoutWidget_3->setGeometry(QRect(30, 560, 151, 32));
+        horizontalLayoutWidget_3->setGeometry(QRect(30, 640, 151, 32));
         horizontalLayout_4 = new QHBoxLayout(horizontalLayoutWidget_3);
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
@@ -182,7 +193,7 @@ public:
 
         groupBox_3 = new QGroupBox(centralWidget);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 10, 191, 541));
+        groupBox_3->setGeometry(QRect(10, 10, 191, 621));
         groupBox_3->setFont(font);
         animation_list = new QListWidget(groupBox_3);
         animation_list->setObjectName(QStringLiteral("animation_list"));
@@ -196,6 +207,14 @@ public:
         delete_button->setEnabled(false);
         delete_button->setGeometry(QRect(10, 500, 171, 31));
         delete_button->setFont(font);
+        copy = new QPushButton(groupBox_3);
+        copy->setObjectName(QStringLiteral("copy"));
+        copy->setGeometry(QRect(10, 540, 171, 31));
+        copy->setFont(font);
+        paste = new QPushButton(groupBox_3);
+        paste->setObjectName(QStringLiteral("paste"));
+        paste->setGeometry(QRect(10, 580, 171, 31));
+        paste->setFont(font);
         transform_group = new QGroupBox(centralWidget);
         transform_group->setObjectName(QStringLiteral("transform_group"));
         transform_group->setEnabled(false);
@@ -443,20 +462,79 @@ public:
         rename_button->setGeometry(QRect(230, 19, 71, 31));
         play_button = new QPushButton(centralWidget);
         play_button->setObjectName(QStringLiteral("play_button"));
-        play_button->setGeometry(QRect(20, 670, 41, 28));
+        play_button->setGeometry(QRect(20, 720, 41, 28));
         pause_button = new QPushButton(centralWidget);
         pause_button->setObjectName(QStringLiteral("pause_button"));
         pause_button->setEnabled(false);
-        pause_button->setGeometry(QRect(70, 670, 51, 28));
+        pause_button->setGeometry(QRect(70, 720, 51, 28));
         loop_check = new QCheckBox(centralWidget);
         loop_check->setObjectName(QStringLiteral("loop_check"));
-        loop_check->setGeometry(QRect(130, 670, 61, 31));
+        loop_check->setGeometry(QRect(130, 720, 61, 31));
         QFont font4;
         font4.setFamily(QString::fromUtf8("\343\203\241\343\202\244\343\203\252\343\202\252"));
         font4.setPointSize(9);
         font4.setBold(false);
         font4.setWeight(50);
         loop_check->setFont(font4);
+        groupBox_7 = new QGroupBox(centralWidget);
+        groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
+        groupBox_7->setGeometry(QRect(1050, 680, 291, 61));
+        horizontalLayoutWidget_8 = new QWidget(groupBox_7);
+        horizontalLayoutWidget_8->setObjectName(QStringLiteral("horizontalLayoutWidget_8"));
+        horizontalLayoutWidget_8->setGeometry(QRect(10, 20, 273, 31));
+        horizontalLayout_8 = new QHBoxLayout(horizontalLayoutWidget_8);
+        horizontalLayout_8->setSpacing(6);
+        horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
+        horizontalLayout_8->setContentsMargins(0, 0, 0, 0);
+        label_16 = new QLabel(horizontalLayoutWidget_8);
+        label_16->setObjectName(QStringLiteral("label_16"));
+
+        horizontalLayout_8->addWidget(label_16);
+
+        eye_x = new QDoubleSpinBox(horizontalLayoutWidget_8);
+        eye_x->setObjectName(QStringLiteral("eye_x"));
+        eye_x->setWrapping(false);
+        eye_x->setProperty("showGroupSeparator", QVariant(false));
+        eye_x->setDecimals(2);
+        eye_x->setMinimum(-10);
+        eye_x->setMaximum(10);
+        eye_x->setSingleStep(0.01);
+
+        horizontalLayout_8->addWidget(eye_x);
+
+        label_17 = new QLabel(horizontalLayoutWidget_8);
+        label_17->setObjectName(QStringLiteral("label_17"));
+
+        horizontalLayout_8->addWidget(label_17);
+
+        eye_y = new QDoubleSpinBox(horizontalLayoutWidget_8);
+        eye_y->setObjectName(QStringLiteral("eye_y"));
+        eye_y->setWrapping(false);
+        eye_y->setProperty("showGroupSeparator", QVariant(false));
+        eye_y->setDecimals(2);
+        eye_y->setMinimum(-10);
+        eye_y->setMaximum(10);
+        eye_y->setSingleStep(0.01);
+
+        horizontalLayout_8->addWidget(eye_y);
+
+        label_18 = new QLabel(horizontalLayoutWidget_8);
+        label_18->setObjectName(QStringLiteral("label_18"));
+
+        horizontalLayout_8->addWidget(label_18);
+
+        eye_z = new QDoubleSpinBox(horizontalLayoutWidget_8);
+        eye_z->setObjectName(QStringLiteral("eye_z"));
+        eye_z->setWrapping(false);
+        eye_z->setProperty("showGroupSeparator", QVariant(false));
+        eye_z->setDecimals(2);
+        eye_z->setMinimum(-10);
+        eye_z->setMaximum(10);
+        eye_z->setSingleStep(0.01);
+
+        horizontalLayout_8->addWidget(eye_z);
+
         hierarchyanimationeditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(hierarchyanimationeditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -499,6 +577,8 @@ public:
         groupBox_3->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Animation", nullptr));
         add_button->setText(QApplication::translate("hierarchyanimationeditorClass", "Add", nullptr));
         delete_button->setText(QApplication::translate("hierarchyanimationeditorClass", "Delete", nullptr));
+        copy->setText(QApplication::translate("hierarchyanimationeditorClass", "Copy", nullptr));
+        paste->setText(QApplication::translate("hierarchyanimationeditorClass", "Paste", nullptr));
         transform_group->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Transform", nullptr));
         groupBox_4->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Position", nullptr));
         label_3->setText(QApplication::translate("hierarchyanimationeditorClass", "X", nullptr));
@@ -519,6 +599,10 @@ public:
         play_button->setText(QApplication::translate("hierarchyanimationeditorClass", "Play", nullptr));
         pause_button->setText(QApplication::translate("hierarchyanimationeditorClass", "Pause", nullptr));
         loop_check->setText(QApplication::translate("hierarchyanimationeditorClass", "Loop", nullptr));
+        groupBox_7->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Eye", nullptr));
+        label_16->setText(QApplication::translate("hierarchyanimationeditorClass", "X", nullptr));
+        label_17->setText(QApplication::translate("hierarchyanimationeditorClass", "Y", nullptr));
+        label_18->setText(QApplication::translate("hierarchyanimationeditorClass", "Z", nullptr));
         menuFile->setTitle(QApplication::translate("hierarchyanimationeditorClass", "File", nullptr));
         menuAnimation->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Animation", nullptr));
     } // retranslateUi

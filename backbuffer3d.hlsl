@@ -36,9 +36,9 @@ float peek(float x, float y)
     return depth_tex.Sample(own_sampler, float2(x, y)).r;
 }
 
-float peek(float2 uv)
+float3 peek2(float x, float y)
 {
-    return depth_tex.Sample(own_sampler, uv).r;
+    return normal_tex.Sample(own_sampler, float2(x, y)).xyz;
 }
 
 static float dx = 0.0015;
@@ -65,24 +65,12 @@ PsOut PS(VsOut input)
     float3 eye_dir = normalize(g_eye - position_.xyz);
 
     float dotE = dot(normal_.xyz, eye_dir);
-
-    float angleL = acos(dotL);
-    float angleE = acos(dotE);
-
-    float alpha = max(angleL, angleE);
-    float beta = min(angleL, angleE);
-
-    float3 al = light_dir - normal_.xyz * dotL;
-    float3 ae = eye_dir - normal_.xyz * dotE;
-
-    float gamma = max(0.0f, dot(al, ae));
+    
     // テカり -
-
 
     // - トゥーン（3値化?）
     float l = max(0.0f, dotL);
-
-    l = min(lerp(step(0.03f, l) * 0.3f, 0.4f, step(0.5, l)) + 0.5f + gamma, 1.0);
+    l = min(lerp(step(0.02f, l) * 0.3f, 0.4f, step(0.5, l)) + 0.6f, 1.0);
 
     // トゥーン（3値化?） - 
     
@@ -91,10 +79,17 @@ PsOut PS(VsOut input)
     float y = input.uv_.y;
     
     float b = peek(x, y);
-    float d = step(0.01f, abs(b - peek(x + dx, y))
+    float2 d;
+    
+    d.x = step(0.01f, abs(b - peek(x + dx, y))
           + abs(b - peek(x, y + dy)));
 
-    float out_line = 1.0 - d;
+    float3 b2 = peek2(x, y);
+
+    d.y = 1.f - step(float3(1.9f, 1.9f, 1.9f), abs(dot(b2, peek2(x + dx, y)))
+          + abs(dot(b2, peek2(x, y + dy))));
+
+    float out_line = 1.0 - min(d.x + d.y, 1.f);
     // outline -
 
     output.color_ = color_ * l * out_line;

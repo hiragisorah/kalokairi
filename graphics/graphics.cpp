@@ -60,12 +60,15 @@ public:
 			, projection_(DirectX::XMMatrixIdentity())
 			, eye_({ 0, 0, 0 })
 			, dir_light_({ 0, 0, 0 })
+			, timer_(0)
 		{}
 
 		DirectX::XMMATRIX view_;
 		DirectX::XMMATRIX projection_;
 		DirectX::XMFLOAT3A eye_;
 		DirectX::XMFLOAT3A dir_light_;
+		__declspec(align(16)) unsigned int timer_;
+
 	} main_cb_;
 
 	struct ModelCB
@@ -414,6 +417,7 @@ void Seed::Graphics::Impl::Initialize(void)
 
 void Seed::Graphics::Impl::Run(void)
 {
+	this->main_cb_.timer_++;
 	this->swap_chain_->Present(0, 0);
 }
 

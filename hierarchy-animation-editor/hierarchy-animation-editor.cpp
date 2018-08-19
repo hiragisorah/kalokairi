@@ -25,6 +25,8 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 	play = false;
 	loop = false;
 
+	copy_data = nullptr;
+
 	auto & widget = ui.widget;
 	auto handle = reinterpret_cast<void*>(widget->winId());
 	auto width = widget->width();
@@ -47,8 +49,8 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 	this->shader_backbuffer_ = graphics.CreateShader("../backbuffer3d.hlsl");
 	this->shader_deffered_ = graphics.CreateShader("../deffered3d.hlsl");
 
-	graphics.SetEye(DirectX::Vector3(0, 5, -5));
-	graphics.SetView(DirectX::Matrix::CreateLookAt(DirectX::Vector3(0, 5, -5), DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0)));
+	this->wire_primitive_ = graphics.CreatePlane(1, 1, { 10.f, 10.f });
+
 	graphics.SetProjection(DirectX::Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PIDIV4,
 		static_cast<float>(graphics.width()) / static_cast<float>(graphics.height()), 0.3f, 1000.f));
 	graphics.SetViewPort(this->vp_);
@@ -57,6 +59,12 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 void hierarchyanimationeditor::paintEvent(QPaintEvent * ev)
 {
 
+}
+
+void hierarchyanimationeditor::closeEvent(QCloseEvent * ev)
+{
+	if (copy_data != nullptr)
+		delete copy_data;
 }
 
 ItemData & hierarchyanimationeditor::GetData(int no)
@@ -93,6 +101,9 @@ ItemData Linear(ItemData & a, ItemData & b, float progress)
 
 void hierarchyanimationeditor::Update(void)
 {
+	graphics.SetEye(wvp.eye);
+	graphics.SetView(DirectX::Matrix::CreateLookAt(wvp.eye, DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0)));
+
 	if (ui.animation_list->currentItem() == nullptr) return;
 
 	int anim_cnt = 0;
@@ -142,6 +153,12 @@ void hierarchyanimationeditor::Update(void)
 	graphics.UpdateMainConstantBuffer();
 
 	graphics.EnableWireFrame(this->wire_frame_);
+	
+	graphics.SetWorld(DirectX::XMMatrixIdentity());
+
+	graphics.UpdateModelConstantBuffer();
+
+	graphics.Draw(this->wire_primitive_);
 
 	if (ui.animation_list->currentItem() != nullptr)
 	{
@@ -210,6 +227,17 @@ void hierarchyanimationeditor::on_delete_button_pressed(void)
 	anim_data.erase(no);
 	delete ui.animation_list->currentItem();
 	anim_no.erase(anim_no.begin() + row);
+}
+
+void hierarchyanimationeditor::on_copy_pressed(void)
+{
+	copy_data = new AnimData(anim_data[ui.animation_list->currentRow()]);
+}
+
+void hierarchyanimationeditor::on_paste_pressed(void)
+{
+	if(copy_data)
+		anim_data[ui.animation_list->currentRow()] = *copy_data;
 }
 
 void hierarchyanimationeditor::on_rename_button_pressed(void)
@@ -356,6 +384,21 @@ void hierarchyanimationeditor::on_scale_z_valueChanged(double value)
 {
 	if (ui.animation_list->currentItem())
 		GetData(ui.parts_list->currentRow()).scale.z = static_cast<float>(value);
+}
+
+void hierarchyanimationeditor::on_eye_x_valueChanged(double value)
+{
+	wvp.eye.x = value;
+}
+
+void hierarchyanimationeditor::on_eye_y_valueChanged(double value)
+{
+	wvp.eye.y = value;
+}
+
+void hierarchyanimationeditor::on_eye_z_valueChanged(double value)
+{
+	wvp.eye.z = value;
 }
 
 void hierarchyanimationeditor::on_speed_valueChanged(double value)

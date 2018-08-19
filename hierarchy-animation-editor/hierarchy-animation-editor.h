@@ -137,6 +137,7 @@ private:
 
 protected:
 	void paintEvent(QPaintEvent * ev);
+	void closeEvent(QCloseEvent * ev);
 
 private:
 	struct WVP
@@ -153,6 +154,8 @@ private:
 
 	std::unordered_map<int, AnimData> anim_data;
 	std::vector<int> anim_no;
+
+	AnimData * copy_data;
 
 	std::unordered_map<int, ItemData> play_data;
 	float current_data;
@@ -172,6 +175,9 @@ private slots:
 	void on_add_button_pressed(void);
 
 	void on_delete_button_pressed(void);
+
+	void on_copy_pressed(void);
+	void on_paste_pressed(void);
 
 	void on_rename_button_pressed(void);
 
@@ -193,6 +199,10 @@ private slots:
 	void on_scale_x_valueChanged(double value);
 	void on_scale_y_valueChanged(double value);
 	void on_scale_z_valueChanged(double value);
+
+	void on_eye_x_valueChanged(double value);
+	void on_eye_y_valueChanged(double value);
+	void on_eye_z_valueChanged(double value);
 
 	void on_speed_valueChanged(double value);
 
@@ -227,6 +237,9 @@ private:
 
 private:
 	DirectX::Vector3 dir_light_;
+
+public:
+	unsigned int wire_primitive_;
 
 private:
 	void UpdatePrimitive(void);
