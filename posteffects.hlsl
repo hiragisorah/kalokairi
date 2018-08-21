@@ -3,6 +3,7 @@
 Texture2D color_tex : register(t0);
 Texture2D position_tex : register(t1);
 Texture2D normal_depth_tex : register(t2);
+Texture2D screen_tex : register(t3);
 
 SamplerState own_sampler : register(s0);
 
@@ -40,8 +41,10 @@ float3 peek2(float x, float y)
     return normal_depth_tex.Sample(own_sampler, float2(x, y)).xyz;
 }
 
-//static float dx = 0.0015;
-//static float dy = 0.0015;
+float4 peek3(float x, float y)
+{
+    return screen_tex.Sample(own_sampler, float2(x, y));
+}
 
 PsOut PS(VsOut input)
 {
@@ -51,50 +54,28 @@ PsOut PS(VsOut input)
     float4 color_ = color_tex.Sample(own_sampler, input.uv_);
     float4 position_ = position_tex.Sample(own_sampler, input.uv_);
     float3 normal_ = normal_depth_tex.Sample(own_sampler, input.uv_).xyz;
-    float depth_ = normal_depth_tex.Sample(own_sampler, input.uv_).w;
+    float3 depth_ = normal_depth_tex.Sample(own_sampler, input.uv_).w;
+    float4 screen_ = screen_tex.Sample(own_sampler, input.uv_);
     // GBuffer -
 
-    // 陰影 
-    float3 light_dir = normalize(g_dir_light - position_.xyz);
-
-    float dotL = dot(normal_, light_dir);
-    //
-
-    // - テカり
-    float3 eye_dir = normalize(g_eye - position_.xyz);
-
-    float dotE = dot(normal_, eye_dir);
-
-    // テカり -
-
-    // - トゥーン（3値化?）
-    float l = max(0.0f, dotL);
-    l = min(lerp(step(0.02f, l) * 0.3f, 0.4f, step(0.5, l)) + 0.5f, 1.0);
-
-    // トゥーン（3値化?） - 
+    //float x = 1 / g_view_port.x;
+    //float y = 1 / g_view_port.y;
+    //float u = input.uv_.x;
+    //float v = input.uv_.y;
+    //float4 screen_avg = 0;
     
-    // -　アウトライン
-    float x = input.uv_.x;
-    float y = input.uv_.y;
-    
-    float b = peek(x, y);
-    float2 d;
+    //for (int w = -1; w < 2; w++)
+    //{
+    //    for (int h = -1; h < 2; h++)
+    //    {
+    //        screen_avg += peek3(u + w * x, v + h * y);
+    //    }
+    //}
 
-    float dx = 2 / g_view_port.x;
-    float dy = 2 / g_view_port.y;
-    
-    d.x = step(0.01f, abs(b - peek(x + dx, y))
-          + abs(b - peek(x, y + dy)));
+    //screen_avg /= 9.f;
 
-    float3 b2 = peek2(x, y);
-
-    d.y = 1.f - step(float3(1.9f, 1.9f, 1.9f), abs(dot(b2, peek2(x + dx, y)))
-          + abs(dot(b2, peek2(x, y + dy))));
-
-    float out_line = 1.0 - min(d.x + d.y, 1.f);
-    // outline -
-
-    output.color_ = color_ * l * out_line;
+    //output.color_ = screen_avg;
+    output.color_ = screen_;
 
     return output;
 }

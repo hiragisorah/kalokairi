@@ -26,6 +26,8 @@ hierarchyanimationeditor::hierarchyanimationeditor(QWidget *parent)
 	loop = false;
 
 	copy_data = nullptr;
+	copy_frame_data = nullptr;
+	copy_frame_data2 = nullptr;
 
 	auto & widget = ui.widget;
 	auto handle = reinterpret_cast<void*>(widget->winId());
@@ -65,12 +67,17 @@ void hierarchyanimationeditor::closeEvent(QCloseEvent * ev)
 {
 	if (copy_data != nullptr)
 		delete copy_data;
+
+	if (copy_frame_data != nullptr)
+		delete copy_frame_data;
+
+	if (copy_frame_data2 != nullptr)
+		delete copy_frame_data2;
 }
 
 ItemData & hierarchyanimationeditor::GetData(int no)
 {
-	auto row = anim_no[ui.animation_list->currentRow()];
-	auto & anim = anim_data[row];
+	auto & anim = anim_data[ui.animation_list->currentRow()];
 	auto value = ui.anim_slider->value();
 	return anim.frames[value][item_no[no]];
 }
@@ -110,8 +117,7 @@ void hierarchyanimationeditor::Update(void)
 
 	if (play)
 	{
-		auto row = anim_no[ui.animation_list->currentRow()];
-		auto & anim = anim_data[row];
+		auto & anim = anim_data[ui.animation_list->currentRow()];
 
 		anim_cnt = anim.frames.size();
 
@@ -134,8 +140,7 @@ void hierarchyanimationeditor::Update(void)
 		
 	if (play)
 	{
-		auto row = anim_no[ui.animation_list->currentRow()];
-		auto & anim = anim_data[row];
+		auto & anim = anim_data[ui.animation_list->currentRow()];
 		auto value = static_cast<int>(current_data) % anim_cnt;
 
 		for (auto & frame : anim.frames[value])
@@ -167,7 +172,10 @@ void hierarchyanimationeditor::Update(void)
 			auto item = GetData(i);
 
 			if (play)
-				item = GetPlayData(i);
+			{
+				if (!anim_data[ui.animation_list->currentRow()].unuse_[item_no[i]])
+					item = GetPlayData(i);
+			}
 
 			if (item.primitive_id != -1)
 			{
@@ -185,7 +193,7 @@ void hierarchyanimationeditor::Update(void)
 
 				while (parent != -1)
 				{
-					auto p = anim_data[anim_no[ui.animation_list->currentRow()]].frames[ui.anim_slider->value()][parent];
+					auto p = anim_data[ui.animation_list->currentRow()].frames[ui.anim_slider->value()][parent];
 
 					if (play)
 						p = play_data[parent];
@@ -222,32 +230,63 @@ void hierarchyanimationeditor::Update(void)
 
 void hierarchyanimationeditor::on_delete_button_pressed(void)
 {
-	auto row = ui.animation_list->currentRow();
-	auto no = anim_no[row];
-	anim_data.erase(no);
+	anim_data.erase(ui.animation_list->currentRow());
 	delete ui.animation_list->currentItem();
-	anim_no.erase(anim_no.begin() + row);
 }
 
 void hierarchyanimationeditor::on_copy_pressed(void)
 {
-	copy_data = new AnimData(anim_data[ui.animation_list->currentRow()]);
+	if(copy_data == nullptr)
+		delete copy_data;
+
+	auto & anim = anim_data[ui.animation_list->currentRow()];
+	auto value = ui.anim_slider->value();
+
+	copy_data = new AnimData(anim);
 }
 
 void hierarchyanimationeditor::on_paste_pressed(void)
 {
-	if(copy_data)
-		anim_data[ui.animation_list->currentRow()] = *copy_data;
+	if (copy_data != nullptr)
+	{
+		auto & anim = anim_data[ui.animation_list->currentRow()];
+		auto value = ui.anim_slider->value();
+		anim = *copy_data;
+	}
+}
+
+void hierarchyanimationeditor::on_copy_frame_pressed(void)
+{
+	if (copy_frame_data == nullptr)
+		delete copy_frame_data;
+
+	if (copy_frame_data2 == nullptr)
+		delete copy_frame_data2;
+
+	auto & anim = anim_data[ui.animation_list->currentRow()];
+	auto value = ui.anim_slider->value();
+
+	copy_frame_data = new std::unordered_map<int, ItemData>(anim.frames[value]);
+	copy_frame_data2 = new float(anim.speed[value]);
+}
+
+void hierarchyanimationeditor::on_paste_frame_pressed(void)
+{
+	if (copy_frame_data)
+	{
+		auto & anim = anim_data[ui.animation_list->currentRow()];
+		auto value = ui.anim_slider->value();
+
+		anim.frames[value] = *copy_frame_data;
+		anim.speed[value] = *copy_frame_data2;
+	}
 }
 
 void hierarchyanimationeditor::on_rename_button_pressed(void)
 {
 	ui.animation_list->currentItem()->setText(ui.rename_box->text());
 
-	auto row = ui.animation_list->currentRow();
-	auto no = anim_no[row];
-
-	anim_data[no].name = ui.rename_box->text().toStdString();
+	anim_data[ui.animation_list->currentRow()].name = ui.rename_box->text().toStdString();
 }
 
 void hierarchyanimationeditor::on_play_button_pressed(void)
@@ -329,6 +368,10 @@ void hierarchyanimationeditor::on_parts_list_currentRowChanged(int row)
 				ui.scale_z->setValue(static_cast<double>(GetData(row).scale.z));
 			}
 		}
+
+		{ // Une
+			ui.use->setChecked(!anim_data[ui.animation_list->currentRow()].unuse_[item_no[ui.parts_list->currentRow()]]);
+		}
 	}
 }
 
@@ -404,26 +447,34 @@ void hierarchyanimationeditor::on_eye_z_valueChanged(double value)
 void hierarchyanimationeditor::on_speed_valueChanged(double value)
 {
 	if (ui.animation_list->currentItem())
-		anim_data[ui.animation_list->currentRow()].speed[ui.anim_slider->value()] = value;
+	{
+		auto & anim = anim_data[ui.animation_list->currentRow()];
+		auto slider_value = ui.anim_slider->value();
+		
+		anim.speed[slider_value] = value;
+	}
 }
 
 void hierarchyanimationeditor::on_anim_max_valueChanged(int value)
 {
 	ui.anim_slider->setMaximum(value - 1);
-	auto frame_cnt = anim_data[ui.animation_list->currentRow()].frames.size();
+
+	auto & anim = anim_data[ui.animation_list->currentRow()];
+	
+	auto frame_cnt = anim.frames.size();
 	if (value < frame_cnt)
 	{
-		anim_data[ui.animation_list->currentRow()].frames.resize(value);
-		anim_data[ui.animation_list->currentRow()].speed.resize(value);
+		anim.frames.resize(value);
+		anim.speed.resize(value);
 	}
 	if (value > frame_cnt)
 	{
 		auto dif = value - frame_cnt;
 		for (int n = 0; n < dif; ++n)
 		{
-			auto & frames = anim_data[ui.animation_list->currentRow()].frames;
+			auto & frames = anim.frames;
 			frames.emplace_back(frames[frames.size() - 1]);
-			anim_data[ui.animation_list->currentRow()].speed.emplace_back(0.01f);
+			anim.speed.emplace_back(0.01f);
 		}
 	}
 }
@@ -442,8 +493,9 @@ void hierarchyanimationeditor::on_anim_slider_valueChanged(int value)
 		ui.scale_x->setValue(static_cast<double>(GetData(ui.parts_list->currentRow()).scale.x));
 		ui.scale_y->setValue(static_cast<double>(GetData(ui.parts_list->currentRow()).scale.y));
 		ui.scale_z->setValue(static_cast<double>(GetData(ui.parts_list->currentRow()).scale.z));
-
-		ui.speed->setValue(static_cast<double>(anim_data[ui.animation_list->currentRow()].speed[ui.anim_slider->value()]));
+		auto & anim = anim_data[ui.animation_list->currentRow()];
+		auto value = ui.anim_slider->value();
+		ui.speed->setValue(static_cast<double>(anim.speed[value]));
 	}
 }
 
@@ -455,6 +507,11 @@ void hierarchyanimationeditor::on_wire_mode_check_toggled(bool toggle)
 void hierarchyanimationeditor::on_loop_check_toggled(bool toggle)
 {
 	loop = toggle;
+}
+
+void hierarchyanimationeditor::on_use_toggled(bool toggle)
+{
+	anim_data[ui.animation_list->currentRow()].unuse_[item_no[ui.parts_list->currentRow()]] = !toggle;
 }
 
 void hierarchyanimationeditor::actionImport(void)
@@ -593,6 +650,15 @@ void hierarchyanimationeditor::Load(std::string file_name)
 	UpdatePrimitive();
 
 	play_data = main_data;
+
+	for (auto & data : anim_data)
+	{
+		auto & sdata = data.second;
+
+		for (auto & frame : sdata.frames)
+			for (auto & mdata : main_data)
+				frame[mdata.first].primitive_id = mdata.second.primitive_id;
+	}
 }
 
 void hierarchyanimationeditor::Save2(std::string file_name)
@@ -609,7 +675,6 @@ void hierarchyanimationeditor::Load2(std::string file_name)
 	anim_data.clear();
 	main_data.clear();
 	play_data.clear();
-	anim_no.clear();
 	item_no.clear();
 	ui.parts_list->clear();
 	ui.animation_list->clear();
@@ -632,16 +697,31 @@ void hierarchyanimationeditor::Load2(std::string file_name)
 
 	play_data = main_data;
 
+	std::vector<int> del_list;
+
+	for (auto & data : anim_data)
+	{
+		if (data.second.self < 0)
+			del_list.emplace_back(data.first);
+	}
+
+	for (auto & del : del_list)
+		anim_data.erase(del);
+
 	for (auto & data : anim_data)
 	{
 		auto & sdata = data.second;
 
-		ui.animation_list->addItem(sdata.name.c_str());
-		anim_no.emplace_back(sdata.self);
+		ui.animation_list->addItem("");
 
 		for (auto & frame : sdata.frames)
 			for (auto & mdata : main_data)
 				frame[mdata.first].primitive_id = mdata.second.primitive_id;
+	}
+
+	for (auto & data : anim_data)
+	{
+		ui.animation_list->item(data.first)->setText(data.second.name.c_str());
 	}
 }
 
@@ -650,7 +730,6 @@ void hierarchyanimationeditor::on_add_button_pressed(void)
 	char str[80];
 	sprintf(str, "%3d: %s", AnimData::cnt, "Empty Animation");
 	ui.animation_list->addItem(str);
-	anim_no.emplace_back(AnimData::cnt);
 	anim_data[AnimData::cnt].name = str;
 
 	for (auto & frame : anim_data[AnimData::cnt].frames)

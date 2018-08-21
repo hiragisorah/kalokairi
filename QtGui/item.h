@@ -90,7 +90,6 @@ struct ItemData
 struct AnimData
 {
 	AnimData(void)
-		: self(cnt)
 	{
 		frames.resize(5);
 		speed.resize(5);
@@ -106,11 +105,17 @@ struct AnimData
 	std::string name;
 
 	std::vector<std::unordered_map<int, ItemData>> frames;
+	std::unordered_map<int, bool> unuse_;
 	std::vector<float> speed;
 
 	template <class Archive>
-	void serialize(Archive & ar)
+	void load(Archive & ar)
 	{
-		ar(self, name, frames, speed);
+		ar(self, name, unuse_, frames, speed);
+	}
+	template <class Archive>
+	void save(Archive & ar) const
+	{
+		ar(self, name, unuse_, frames, speed);
 	}
 };

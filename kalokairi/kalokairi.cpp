@@ -4,6 +4,7 @@
 static std::unordered_map<Qt::Key, Input::KeyState> _keys;
 static std::unordered_map<Qt::Key, bool> _new_keys;
 static std::unordered_map<Qt::Key, bool> _old_keys;
+static std::unordered_map<Qt::Key, unsigned int> _t_keys;
 
 Kalokairi::Kalokairi(QWidget *parent)
 	: QMainWindow(parent)
@@ -83,11 +84,20 @@ void Input::Update(void)
 	{
 		auto & new_status = _new_keys[key.first];
 		auto & old_status = _old_keys[key.first];
+		auto & t_status = _t_keys[key.first];
+		
+		if(t_status) t_status++;
+
+		if (t_status > 20)
+			t_status = 0;
 
 		if (!old_status && !new_status) _keys[key.first] = Input::KeyState::None;
 		if (!old_status && new_status) _keys[key.first] = Input::KeyState::Trigger;
 		if (old_status && new_status) _keys[key.first] = Input::KeyState::Press;
 		if (old_status && !new_status) _keys[key.first] = Input::KeyState::Release;
+
+		if (!old_status && new_status && t_status) _keys[key.first] = Input::KeyState::Repeat;
+		if (!old_status && new_status) t_status = 1;
 
 		old_status = new_status;
 	}
@@ -95,12 +105,17 @@ void Input::Update(void)
 
 bool Input::Trigger(const Qt::Key & key)
 {
-	return _keys[key] == Input::KeyState::Trigger;
+	return _keys[key] == Input::KeyState::Trigger || _keys[key] == Input::KeyState::Repeat;
 }
 
 bool Input::Release(const Qt::Key & key)
 {
 	return _keys[key] == Input::KeyState::Release;
+}
+
+bool Input::Repeat(const Qt::Key & key)
+{
+	return _keys[key] == Input::KeyState::Repeat;
 }
 
 bool Input::Press(const Qt::Key & key)

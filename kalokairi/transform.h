@@ -45,16 +45,30 @@ public:
 	void set_offset_scale(const DirectX::Vector3 & offset_scale);
 
 	void set_position(const DirectX::Vector3 & position);
+	void set_position(const DirectX::Vector3 & position, const float & progress);
+	void set_fixed_rotation(const DirectX::Vector3 & rotation);
 	void set_rotation(const DirectX::Vector3 & rotation);
+	void set_rotation(const DirectX::Vector3 & rotation, const float & progress);
 	void set_scale(const DirectX::Vector3 & scale);
+	void set_scale(const DirectX::Vector3 & scale, const float & progress);
 
 public:
 	void MoveForward(const float & speed);
-	void MoveSide(const float & speed);
+	void MoveLeft(const float & speed);
+	void MoveRight(const float & speed);
+
+	void RotateX(const float & speed);
 	void RotateY(const float & speed);
+	void RotateZ(const float & speed);
+
+public:
+	void Update(void);
 
 public:
 	DirectX::Matrix TransformMatrix(void);
 	DirectX::Matrix OffsetMatrix(void);
 	DirectX::Matrix FinalMatrix(void);
+	DirectX::Matrix FinalMatrixWithoutOffset(void);
+	DirectX::Vector3 FinalPosition(void);
+	DirectX::Vector3 FinalRotation(void);
 };

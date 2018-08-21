@@ -3,7 +3,6 @@
 #include "rendering_system.h"
 #include "player_system.h"
 #include "stage.h"
-#include "screen.h"
 #include "camera.h"
 
 void MainScene::Initialize(void)
@@ -13,5 +12,4 @@ void MainScene::Initialize(void)
 	this->AddSystem<PlayerSystem>();
 
 	this->CreateEntity<Stage>();
-	this->CreateEntity<Screen>();
 }

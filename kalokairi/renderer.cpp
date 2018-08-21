@@ -13,10 +13,13 @@ Renderer::Renderer(const std::string & model_file, const std::string & animation
 
 }
 
+Renderer::~Renderer(void)
+{
+	delete this->animation_;
+}
+
 void Renderer::Initialize(void)
 {
-	auto graphics = this->owner()->scene()->engine()->graphics();
-
 	this->ReadHierarchyFromFile(this->model_file_);
 
 	if (this->animation_file_ != "")
@@ -29,12 +32,14 @@ void Renderer::Initialize(void)
 
 void Renderer::Update(void)
 {
-	if(this->animation_file_ != "")
-		this->animation_->Update();
+
 }
 
 void Renderer::Always(void)
 {
+	if (this->animation_file_ != "")
+		this->animation_->Update();
+
 	auto rs = this->owner()->scene()->System<RenderingSystem>();
 
 	for (auto & model : this->model_list_)
@@ -119,6 +124,11 @@ void Renderer::ReadHierarchyAnimationFromFile(const std::string & file_name)
 	{
 		auto & anim = anim_map.second;
 
+		for (auto & unuse : anim.unuse_)
+			if(unuse.second)
+				for(auto & frame : anim.frames)
+					frame.erase(unuse.first);
+
 		Animation animation;
 		animation.frames_.resize(anim.frames.size());
 
@@ -155,4 +165,14 @@ const int Renderer::Find(const std::string & model_name)
 HierarchyAnimation * const Renderer::animation(void)
 {
 	return this->animation_;
+}
+
+HierarchyModel * const Renderer::model_list(const int & parts)
+{
+	return &this->model_list_[parts];
+}
+
+HierarchyModelList * const Renderer::model_list(void)
+{
+	return &this->model_list_;
 }

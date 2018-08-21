@@ -29,7 +29,8 @@ void Camera::Update(void)
 		auto position = this->target_->FinalMatrix().Translation();
 		auto back = this->target_->FinalMatrix().Backward();
 		this->at_ = DirectX::Vector3::Lerp(this->eye_, position, 0.1f);
-		this->eye_ = DirectX::Vector3::Lerp(this->eye_, position + back * 5.f + DirectX::Vector3(0, 1.f, 0), 0.05f);
+		//this->eye_ = DirectX::Vector3::Lerp(this->eye_, position + back * 5.f + DirectX::Vector3(0, 1.f, 0), 0.05f);
+		this->eye_ = DirectX::Vector3::Lerp(this->eye_, position - DirectX::Vector3(0, -2.f, 5.f), 0.05f);
 		this->eye_ += 0.20f * DirectX::Vector3::Down + DirectX::Vector3::Up * DirectX::Vector3::Distance(this->eye_, position) * 0.05f;
 	}
 }

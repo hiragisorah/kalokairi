@@ -929,6 +929,56 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QPushButton" name="copy_frame">
+    <property name="geometry">
+     <rect>
+      <x>1220</x>
+      <y>620</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Copy Frame</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="paste_frame">
+    <property name="geometry">
+     <rect>
+      <x>1220</x>
+      <y>650</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Paste Frame</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="use">
+    <property name="geometry">
+     <rect>
+      <x>1090</x>
+      <y>660</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>メイリオ</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Use</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

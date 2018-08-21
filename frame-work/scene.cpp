@@ -49,6 +49,7 @@ void Seed::Scene::Update(void)
 		}
 		else
 		{
+			delete *itr;
 			itr = this->entities_.erase(itr);
 		}
 }
@@ -67,6 +68,7 @@ void Seed::Scene::Pause(void)
 		}
 		else
 		{
+			delete *itr;
 			itr = this->entities_.erase(itr);
 		}
 }
@@ -89,6 +91,7 @@ void Seed::Scene::Always(void)
 		}
 		else
 		{
+			delete *itr;
 			itr = this->entities_.erase(itr);
 		}
 }

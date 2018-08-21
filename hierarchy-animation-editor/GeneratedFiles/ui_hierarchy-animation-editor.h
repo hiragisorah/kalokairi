@@ -106,6 +106,9 @@ public:
     QDoubleSpinBox *eye_y;
     QLabel *label_18;
     QDoubleSpinBox *eye_z;
+    QPushButton *copy_frame;
+    QPushButton *paste_frame;
+    QCheckBox *use;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuAnimation;
@@ -535,6 +538,17 @@ public:
 
         horizontalLayout_8->addWidget(eye_z);
 
+        copy_frame = new QPushButton(centralWidget);
+        copy_frame->setObjectName(QStringLiteral("copy_frame"));
+        copy_frame->setGeometry(QRect(1220, 620, 93, 28));
+        paste_frame = new QPushButton(centralWidget);
+        paste_frame->setObjectName(QStringLiteral("paste_frame"));
+        paste_frame->setGeometry(QRect(1220, 650, 93, 28));
+        use = new QCheckBox(centralWidget);
+        use->setObjectName(QStringLiteral("use"));
+        use->setGeometry(QRect(1090, 660, 71, 31));
+        use->setFont(font1);
+        use->setChecked(true);
         hierarchyanimationeditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(hierarchyanimationeditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -603,6 +617,9 @@ public:
         label_16->setText(QApplication::translate("hierarchyanimationeditorClass", "X", nullptr));
         label_17->setText(QApplication::translate("hierarchyanimationeditorClass", "Y", nullptr));
         label_18->setText(QApplication::translate("hierarchyanimationeditorClass", "Z", nullptr));
+        copy_frame->setText(QApplication::translate("hierarchyanimationeditorClass", "Copy Frame", nullptr));
+        paste_frame->setText(QApplication::translate("hierarchyanimationeditorClass", "Paste Frame", nullptr));
+        use->setText(QApplication::translate("hierarchyanimationeditorClass", "Use", nullptr));
         menuFile->setTitle(QApplication::translate("hierarchyanimationeditorClass", "File", nullptr));
         menuAnimation->setTitle(QApplication::translate("hierarchyanimationeditorClass", "Animation", nullptr));
     } // retranslateUi

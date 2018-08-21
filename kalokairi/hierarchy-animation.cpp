@@ -36,10 +36,9 @@ void HierarchyAnimation::SetAnimation(Animation * const animation, const int & p
 	animation->progress_ = start_progress;
 }
 
-void HierarchyAnimation::SetIntercept(const int & parts, Transform * transform, const float & force)
+void HierarchyAnimation::SetIntercept(const int & parts, Transform * transform)
 {
 	this->intercept_[parts] = transform;
-	this->force_[parts] = force;
 }
 
 void HierarchyAnimation::RemoveAnimation(const int & priority)
@@ -47,10 +46,20 @@ void HierarchyAnimation::RemoveAnimation(const int & priority)
 	this->next_animation_[priority] = nullptr;
 }
 
+void HierarchyAnimation::RemoveAnimation(const std::string & animation_name)
+{
+	for (auto & next_animation : this->next_animation_)
+	{
+		if (next_animation == &this->animations_[animation_name])
+		{
+			next_animation = nullptr;
+		}
+	}
+}
+
 void HierarchyAnimation::RemoveIntercept(const int & parts)
 {
-	this->intercept_[parts] = nullptr;
-	this->force_[parts] = 0.f;
+	this->intercept_.erase(parts);
 }
 
 void HierarchyAnimation::Update(void)
@@ -63,17 +72,12 @@ void HierarchyAnimation::Update(void)
 	{
 		auto & key = intercept.first;
 		auto & transform = intercept.second;
-		auto & force = this->force_[key];
 
 		parts_check.emplace_back(key);
 
 		auto model_transform = (*this->model_list_)[key].transform();
 
-		auto new_transform = Completion(*model_transform, *transform, force);
-
-		model_transform->set_position(new_transform.position_);
-		model_transform->set_rotation(new_transform.rotation_);
-		model_transform->set_scale(new_transform.scale_);
+		*model_transform = *transform;
 	}
 
 	for (auto & next_animation : this->next_animation_)

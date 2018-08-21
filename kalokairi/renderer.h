@@ -9,6 +9,7 @@ class Renderer : public Seed::Component
 {
 public:
 	Renderer(const std::string & model_file, const std::string & animation_file = "");
+	virtual ~Renderer(void);
 
 private:
 	std::string model_file_;
@@ -33,4 +34,7 @@ public:
 
 public:
 	HierarchyAnimation * const animation(void);
+	HierarchyModel * const Renderer::model_list(const int & parts);
+	HierarchyModelList * const Renderer::model_list(void);
+
 };

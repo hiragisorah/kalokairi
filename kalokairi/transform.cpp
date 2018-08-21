@@ -77,9 +77,39 @@ void Transform::set_position(const DirectX::Vector3 & position)
 	this->position_ = position;
 }
 
+void Transform::set_position(const DirectX::Vector3 & position, const float & progress)
+{
+	this->position_ = this->position_ + (position - this->position_) * progress;
+}
+
+void Transform::set_fixed_rotation(const DirectX::Vector3 & rotation)
+{
+	DirectX::Quaternion q;
+	DirectX::Vector3 t, s;
+	auto m = this->parent_->FinalMatrix();
+	m.Decompose(s, q, t);
+
+	auto r = QuaternionToYawPitchRoll(q);
+
+	r.y = 0;
+	r.x = 0;
+
+	this->rotation_ = rotation - r;
+}
+
 void Transform::set_rotation(const DirectX::Vector3 & rotation)
 {
 	this->rotation_ = rotation;
+}
+
+void Transform::set_rotation(const DirectX::Vector3 & rotation, const float & progress)
+{
+	DirectX::Quaternion a, b;
+
+	a = DirectX::Quaternion::CreateFromYawPitchRoll(DirectX::XMConvertToRadians(this->rotation_.y), DirectX::XMConvertToRadians(this->rotation_.x), DirectX::XMConvertToRadians(this->rotation_.z));
+	b = DirectX::Quaternion::CreateFromYawPitchRoll(DirectX::XMConvertToRadians(rotation.y), DirectX::XMConvertToRadians(rotation.x), DirectX::XMConvertToRadians(rotation.z));
+
+	this->rotation_ = QuaternionToYawPitchRoll(DirectX::Quaternion::Slerp(a, b, progress));
 }
 
 void Transform::set_scale(const DirectX::Vector3 & scale)
@@ -87,21 +117,43 @@ void Transform::set_scale(const DirectX::Vector3 & scale)
 	this->scale_ = scale;
 }
 
-void Transform::MoveSide(const float & speed)
+void Transform::set_scale(const DirectX::Vector3 & scale, const float & progress)
 {
-	this->position_.z += cos(DirectX::XMConvertToRadians(this->rotation_.y - 90.f)) * speed;
-	this->position_.x += sin(DirectX::XMConvertToRadians(this->rotation_.y - 90.f)) * speed;
+	this->scale_ = this->scale_ + (scale - this->scale_) * progress;
 }
 
 void Transform::MoveForward(const float & speed)
 {
-	this->position_.z += cos(DirectX::XMConvertToRadians(this->rotation_.y + 180.f)) * speed;
-	this->position_.x += sin(DirectX::XMConvertToRadians(this->rotation_.y + 180.f)) * speed;
+	this->position_ += this->FinalMatrix().Forward() * speed;
+}
+
+void Transform::MoveLeft(const float & speed)
+{
+	this->position_ += this->FinalMatrix().Left() * speed;
+}
+
+void Transform::MoveRight(const float & speed)
+{
+	this->position_ += this->FinalMatrix().Left() * speed;
+}
+
+void Transform::RotateX(const float & speed)
+{
+	this->rotation_.x += speed;
 }
 
 void Transform::RotateY(const float & speed)
 {
 	this->rotation_.y += speed;
+}
+
+void Transform::RotateZ(const float & speed)
+{
+	this->rotation_.z += speed;
+}
+
+void Transform::Update(void)
+{
 }
 
 DirectX::Matrix Transform::TransformMatrix(void)
@@ -134,4 +186,37 @@ DirectX::Matrix Transform::FinalMatrix(void)
 	}
 
 	return ret;
+}
+
+DirectX::Matrix Transform::FinalMatrixWithoutOffset(void)
+{
+	DirectX::Matrix ret;
+
+	ret = this->TransformMatrix();
+
+	auto parent = this->parent_;
+
+	while (parent != nullptr)
+	{
+		ret *= parent->TransformMatrix();
+
+		parent = parent->parent_;
+	}
+
+	return ret;
+}
+
+DirectX::Vector3 Transform::FinalPosition(void)
+{
+	return this->FinalMatrixWithoutOffset().Translation();
+}
+
+DirectX::Vector3 Transform::FinalRotation(void)
+{
+	DirectX::Quaternion q;
+	DirectX::Vector3 t, s;
+	auto m = this->FinalMatrixWithoutOffset();
+	m.Decompose(s, q, t);
+
+	return QuaternionToYawPitchRoll(q);
 }

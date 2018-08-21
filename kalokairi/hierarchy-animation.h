@@ -43,13 +43,19 @@ static AnimationTransform Completion(const AnimationTransform & a, const Animati
 {
 	AnimationTransform ret;
 
+	//DirectX::Quaternion q1, q2;
+
+	//q1 = DirectX::Quaternion::CreateFromYawPitchRoll(DirectX::XMConvertToRadians(a.rotation_.y), DirectX::XMConvertToRadians(a.rotation_.x), DirectX::XMConvertToRadians(a.rotation_.z));
+	//q2 = DirectX::Quaternion::CreateFromYawPitchRoll(DirectX::XMConvertToRadians(b.rotation_.y), DirectX::XMConvertToRadians(b.rotation_.x), DirectX::XMConvertToRadians(b.rotation_.z));
+
+	//ret.rotation_ = QuaternionToYawPitchRoll(DirectX::Quaternion::Slerp(q1, q2, progress));
+
 	ret.position_ = DirectX::Vector3::Lerp(a.position_, b.position_, progress);
 	ret.rotation_ = DirectX::Vector3::Lerp(a.rotation_, b.rotation_, progress);
 	ret.scale_ = DirectX::Vector3::Lerp(a.scale_, b.scale_, progress);
 
 	return ret;
 }
-
 
 static AnimationTransform Completion(const Transform & a, const Transform & b, const float & progress)
 {
@@ -109,14 +115,14 @@ public:
 public:
 	void SetAnimation(const std::string & animation_name, const int & priority, const float & start_progress = 0.f);
 	void SetAnimation(Animation * const animation, const int & priority, const float & start_progress = 0.f);
-	void SetIntercept(const int & parts, Transform * transform, const float & force);
+	void SetIntercept(const int & parts, Transform * transform);
 	void RemoveAnimation(const int & priority);
+	void RemoveAnimation(const std::string & animation_name);
 	void RemoveIntercept(const int & parts);
 
 private:
 	Animation * next_animation_[10];
 	std::unordered_map<int, Transform*> intercept_;
-	std::unordered_map<int, float> force_;
 
 public:
 	void Update(void);

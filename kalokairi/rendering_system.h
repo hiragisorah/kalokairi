@@ -21,6 +21,7 @@ private:
 	void Rendering(Seed::Graphics & graphics, HierarchyModel * const model);
 
 private:
+	unsigned int shader_post_effects_;
 	unsigned int shader_backbuffer_;
 	unsigned int shader_deffered_;
 

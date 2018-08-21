@@ -87,6 +87,18 @@
     <ClCompile Include="player_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pistol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pistol_movement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bullet_movement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="kalokairi.h">
@@ -140,6 +152,18 @@
     <ClInclude Include="player_system.h">
       <Filter>Header Files\system</Filter>
     </ClInclude>
+    <ClInclude Include="pistol.h">
+      <Filter>Header Files\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="pistol_movement.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="bullet.h">
+      <Filter>Header Files\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="bullet_movement.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -152,6 +176,12 @@
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="..\backbuffer3d.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="..\posteffects.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shadowmap.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

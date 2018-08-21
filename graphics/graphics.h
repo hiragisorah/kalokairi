@@ -77,6 +77,7 @@ namespace Seed
 		void SetProjection(const DirectX::XMMATRIX & projection);
 		void SetEye(const DirectX::Vector3 & eye);
 		void SetDirectionLight(const DirectX::Vector3 & dir_light);
+		void SetDiffuse(const DirectX::Vector4 & color);
 
 	private:
 		// Private implementation.

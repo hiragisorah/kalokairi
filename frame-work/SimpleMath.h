@@ -26,6 +26,11 @@
 #define XM_CONSTEXPR
 #endif
 
+template<class _Ty>
+static float _sign(const _Ty & f)
+{
+	return static_cast<_Ty>(f > 0) - static_cast<_Ty>(f < 0);
+}
 
 namespace DirectX
 {
@@ -1063,3 +1068,65 @@ namespace std
     };
 
 } // namespace std
+
+inline DirectX::Vector3 QuaternionToYawPitchRoll(const DirectX::Quaternion & q)
+{
+	DirectX::Vector3 ret;
+
+	//// Pitch
+	//ret.x = DirectX::XMConvertToDegrees(atan2(2 * (q.y*q.z + q.w * q.x), q.w*q.w - q.x * q.x - q.y * q.y + q.z * q.z));
+
+	//// Yaw
+	//ret.y = DirectX::XMConvertToDegrees(asin(-2 * (q.x*q.z - q.w * q.y)));
+
+	//// Roll
+	//ret.z = DirectX::XMConvertToDegrees(atan2(2 * (q.x*q.y + q.w * q.z), q.w*q.w + q.x * q.x - q.y * q.y - q.z * q.z));
+
+	const float Epsilon = 0.0009765625f;
+	const float Threshold = 0.5f - Epsilon;
+
+	float yaw;
+	float pitch;
+	float roll;
+
+	float XY = q.x * q.y;
+	float ZW = q.z * q.w;
+
+	float TEST = XY + ZW;
+
+	if (TEST < -Threshold || TEST > Threshold) {
+
+		int sign = static_cast<int>(_sign(TEST));
+
+		yaw = sign * 2 * (float)atan2(q.x, q.w);
+
+		pitch = sign * DirectX::XM_PIDIV2;
+
+		roll = 0;
+
+	}
+	else
+	{
+		float XX = q.x * q.x;
+		float XZ = q.x * q.z;
+		float XW = q.x * q.w;
+
+		float YY = q.y * q.y;
+		float YW = q.y * q.w;
+		float YZ = q.y * q.z;
+
+		float ZZ = q.z * q.z;
+
+		yaw = (float)atan2(2 * YW - 2 * XZ, 1 - 2 * YY - 2 * ZZ);
+
+		pitch = (float)atan2(2 * XW - 2 * YZ, 1 - 2 * XX - 2 * ZZ);
+
+		roll = (float)asin(2 * TEST);
+	}
+
+	ret.x = DirectX::XMConvertToDegrees(pitch);
+	ret.y = DirectX::XMConvertToDegrees(yaw);
+	ret.z = DirectX::XMConvertToDegrees(roll);
+
+	return ret;
+}

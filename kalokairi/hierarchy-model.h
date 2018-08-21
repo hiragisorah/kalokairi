@@ -31,9 +31,12 @@ public:
 
 private:
 	Transform * transform_;
+	DirectX::Vector4 diffuse_;
 
 public:
 	Transform * const transform(void) const;
+	const DirectX::Vector4 & diffuse(void);
+	void set_diffuse(const DirectX::Vector4 & diffuse);
 };
 
 using HierarchyModelList = std::unordered_map<int, HierarchyModel>;

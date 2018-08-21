@@ -17,11 +17,13 @@ namespace Input
 		Trigger,
 		Press,
 		Release,
+		Repeat,
 	};
 
 	void Update(void);
 	bool Trigger(const Qt::Key & key);
 	bool Release(const Qt::Key & key);
+	bool Repeat(const Qt::Key & key);
 	bool Press(const Qt::Key & key);
 }
 

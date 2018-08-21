@@ -58,16 +58,20 @@ public:
 		MainCB(void)
 			: view_(DirectX::XMMatrixIdentity())
 			, projection_(DirectX::XMMatrixIdentity())
+			, tex_uv_(DirectX::XMMatrixIdentity())
 			, eye_({ 0, 0, 0 })
 			, dir_light_({ 0, 0, 0 })
 			, timer_(0)
+			, view_port_({ 0, 0 })
 		{}
 
 		DirectX::XMMATRIX view_;
 		DirectX::XMMATRIX projection_;
+		DirectX::XMMATRIX tex_uv_;
 		DirectX::XMFLOAT3A eye_;
 		DirectX::XMFLOAT3A dir_light_;
 		__declspec(align(16)) unsigned int timer_;
+		DirectX::XMFLOAT2A view_port_;
 
 	} main_cb_;
 
@@ -75,9 +79,11 @@ public:
 	{
 		ModelCB(void)
 			: world_(DirectX::XMMatrixIdentity())
+			, color_({ 1, 1, 1, 0.5f })
 		{}
 
 		DirectX::XMMATRIX world_;
+		DirectX::XMFLOAT4 color_;
 	} model_cb_;
 
 private:
@@ -126,6 +132,7 @@ public:
 	void SetProjection(const DirectX::XMMATRIX & projection);
 	void SetEye(const DirectX::Vector3 & eye);
 	void SetDirectionLight(const DirectX::Vector3 & dir_light);
+	void SetDiffuse(const DirectX::Vector4 & color);
 };
 
 const unsigned int Seed::Graphics::CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size)
@@ -226,6 +233,11 @@ void Seed::Graphics::SetEye(const DirectX::Vector3 & eye)
 void Seed::Graphics::SetDirectionLight(const DirectX::Vector3 & dir_light)
 {
 	this->impl_->SetDirectionLight(dir_light);
+}
+
+void Seed::Graphics::SetDiffuse(const DirectX::Vector4 & color)
+{
+	this->impl_->SetDiffuse(color);
 }
 
 Seed::Graphics::~Graphics(void)
@@ -337,7 +349,7 @@ Seed::Graphics::Graphics(void)
 }
 
 void Seed::Graphics::Impl::Initialize(void)
-{	
+{
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 
 	{ // デバイスとスワップチェーンの作成 
@@ -413,6 +425,21 @@ void Seed::Graphics::Impl::Initialize(void)
 	this->device_context_->HSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
 	this->device_context_->DSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
 	this->device_context_->PSSetConstantBuffers(1, 1, this->model_buffer_.GetAddressOf());
+
+	this->main_cb_.view_port_ = { static_cast<float>(this->width_), static_cast<float>(this->height_) };
+
+
+	this->main_cb_.tex_uv_.r[0] = DirectX::XMVectorSet(+.5f, +.0f, .0f, .0f);
+	this->main_cb_.tex_uv_.r[1] = DirectX::XMVectorSet(+.0f, -.5f, .0f, .0f);
+	this->main_cb_.tex_uv_.r[2] = DirectX::XMVectorSet(+.0f, +.0f, .5f, .0f);
+	this->main_cb_.tex_uv_.r[3] = DirectX::XMVectorSet(+.5f, +.5f, .0f, 1.f);
+
+	//this->main_cb_.tex_uv_._m[1][1] = 0.5;
+	//m_mClipToUV._22 = -0.5;
+	//m_mClipToUV._33 = 1;
+	//m_mClipToUV._41 = 0.5;
+	//m_mClipToUV._42 = 0.5;
+	//m_mClipToUV._44 = 1;
 }
 
 void Seed::Graphics::Impl::Run(void)
@@ -657,4 +684,9 @@ void Seed::Graphics::Impl::SetEye(const DirectX::Vector3 & eye)
 void Seed::Graphics::Impl::SetDirectionLight(const DirectX::Vector3 & dir_light)
 {
 	this->main_cb_.dir_light_ = { dir_light.x, dir_light.y, dir_light.z };
+}
+
+void Seed::Graphics::Impl::SetDiffuse(const DirectX::Vector4 & color)
+{
+	this->model_cb_.color_ = color;
 }

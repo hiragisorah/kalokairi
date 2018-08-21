@@ -114,12 +114,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\QtGui\item.cpp" />
+    <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="bullet_movement.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="hierarchy-animation.cpp" />
     <ClCompile Include="kalokairi.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main_scene.cpp" />
     <ClCompile Include="hierarchy-model.cpp" />
+    <ClCompile Include="pistol.cpp" />
+    <ClCompile Include="pistol_movement.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_movement.cpp" />
     <ClCompile Include="player_system.cpp" />
@@ -147,10 +151,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bullet.h" />
+    <ClInclude Include="bullet_movement.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="hierarchy-animation.h" />
     <ClInclude Include="main_scene.h" />
     <ClInclude Include="hierarchy-model.h" />
+    <ClInclude Include="pistol.h" />
+    <ClInclude Include="pistol_movement.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="player_movement.h" />
     <ClInclude Include="player_system.h" />
@@ -171,6 +179,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\deffered3d.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\posteffects.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\shadowmap.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
