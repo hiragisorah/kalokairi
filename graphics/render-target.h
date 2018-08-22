@@ -29,6 +29,7 @@ namespace Seed
 		static std::unique_ptr<RenderTarget> ColorMap(const SwapChain & swap_chain, const DeviceContext & device_context, const unsigned int & width, const unsigned int & height);
 		static std::unique_ptr<RenderTarget> PositionMap(const SwapChain & swap_chain, const DeviceContext & device_context, const unsigned int & width, const unsigned int & height);
 		static std::unique_ptr<RenderTarget> NormalMap(const SwapChain & swap_chain, const DeviceContext & device_context, const unsigned int & width, const unsigned int & height);
+		static std::unique_ptr<RenderTarget> R32Map(const SwapChain & swap_chain, const DeviceContext & device_context, const unsigned int & width, const unsigned int & height);
 
 	private:
 		ID3D11RenderTargetView * const GetRTV(void) const;

@@ -28,6 +28,7 @@ public:
 	void ColorMap(const unsigned int & width, const unsigned int & height);
 	void PositionMap(const unsigned int & width, const unsigned int & height);
 	void NormalMap(const unsigned int & width, const unsigned int & height);
+	void R32Map(const unsigned int & width, const unsigned int & height);
 
 public:
 	void Clear(void) const;
@@ -65,6 +66,15 @@ std::unique_ptr<Seed::RenderTarget> Seed::RenderTarget::PositionMap(const SwapCh
 }
 
 std::unique_ptr<Seed::RenderTarget> Seed::RenderTarget::NormalMap(const SwapChain & swap_chain, const DeviceContext & device_context, const unsigned int & width, const unsigned int & height)
+{
+	std::unique_ptr<RenderTarget> render_target(new RenderTarget(swap_chain, device_context));
+
+	render_target->impl_->NormalMap(width, height);
+
+	return render_target;
+}
+
+std::unique_ptr<Seed::RenderTarget> Seed::RenderTarget::R32Map(const SwapChain & swap_chain, const DeviceContext & device_context, const unsigned int & width, const unsigned int & height)
 {
 	std::unique_ptr<RenderTarget> render_target(new RenderTarget(swap_chain, device_context));
 
@@ -216,6 +226,44 @@ void Seed::RenderTarget::Impl::NormalMap(const unsigned int & width, const unsig
 
 	//ノーマルマップ用テクスチャーとそのレンダーターゲットビュー、シェーダーリソースビューの作成	
 	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	device->CreateTexture2D(&desc, nullptr, texture_2d.GetAddressOf());
+
+	RTVDesc.Format = desc.Format;
+	RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	RTVDesc.Texture2D.MipSlice = 0;
+	device->CreateRenderTargetView(texture_2d.Get(), &RTVDesc, this->rtv_.GetAddressOf());
+
+	SRVDesc.Format = desc.Format;
+	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	SRVDesc.Texture2D.MipLevels = 1;
+	device->CreateShaderResourceView(texture_2d.Get(), &SRVDesc, this->srv_.GetAddressOf());
+}
+
+void Seed::RenderTarget::Impl::R32Map(const unsigned int & width, const unsigned int & height)
+{
+	Microsoft::WRL::ComPtr<ID3D11Device> device;
+
+	this->device_context_->GetDevice(device.GetAddressOf());
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_2d;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	D3D11_RENDER_TARGET_VIEW_DESC RTVDesc = {};
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = width;
+	desc.Height = height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+	device->CreateTexture2D(&desc, nullptr, texture_2d.GetAddressOf());
+
+	//ノーマルマップ用テクスチャーとそのレンダーターゲットビュー、シェーダーリソースビューの作成	
+	desc.Format = DXGI_FORMAT_R32_FLOAT;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;

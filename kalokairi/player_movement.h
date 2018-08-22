@@ -5,6 +5,7 @@
 #include "hierarchy-animation.h"
 #include "renderer.h"
 #include "pistol.h"
+#include "camera.h"
 
 class PlayerMovement final : public Seed::Component
 {
@@ -29,6 +30,7 @@ private:
 private:
 	int r_arm1_id_;
 	float fade_;
+	Camera * camera_;
 
 public:
 	Transform * const transform(void);

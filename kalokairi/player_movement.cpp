@@ -27,7 +27,8 @@ void PlayerMovement::Initialize(void)
 	this->renderer_->animation()->SetAnimation("idle", 1);
 	this->renderer_->animation()->SetIntercept(0, this->transform_);
 
-	this->owner()->scene()->System<Camera>()->set_target(this->transform_);
+	this->camera_ = this->owner()->scene()->System<Camera>();
+	this->camera_->set_target(this->transform_);
 
 	auto r_hand_id = this->renderer_->Find("r_hand");
 	auto r_hand_model = this->renderer_->model_list(r_hand_id);
@@ -167,7 +168,9 @@ void PlayerMovement::Update(void)
 	}
 
 	auto rot = this->transform_->rotation();
-	rot.y = DirectX::XMConvertToDegrees(atan2f(-move_side, -move_forward));
+	auto v3 = this->transform_->position();
+	
+	rot.y = DirectX::XMConvertToDegrees(atan2f(-move_side, -move_forward) /*+ atan2f(v3.x, v3.z)*/);
 
 	if (move_forward || move_side)
 	{

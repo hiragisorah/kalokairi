@@ -88,6 +88,11 @@ void QtGui::paintEvent(QPaintEvent * ev)
 				parent = p.parent;
 			}
 
+			if (i == ui.parts_list->currentRow())
+				graphics.SetDiffuse(DirectX::Vector4(1, .8f, .8f, 1));
+			else
+				graphics.SetDiffuse(DirectX::Vector4(1, 1, 1, 0.5f));
+
 			graphics.SetWorld(offset * world);
 
 			graphics.UpdateModelConstantBuffer();

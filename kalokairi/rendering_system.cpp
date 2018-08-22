@@ -6,7 +6,7 @@ void RenderingSystem::Initialize(void)
 {
 	auto graphics = this->owner()->engine()->graphics();
 
-	this->dir_light_ = DirectX::Vector3(0, -100, 50);
+	this->dir_light_ = DirectX::Vector3(0, -25, 25);
 
 	this->backbuffer_ = graphics->CreateBackBuffer();
 	
@@ -14,6 +14,7 @@ void RenderingSystem::Initialize(void)
 	this->pos_map_ = graphics->CreatePositionMap(graphics->width(), graphics->height());
 	this->nor_map_ = graphics->CreateNormalMap(graphics->width(), graphics->height());
 	this->dep_map_ = graphics->CreateNormalMap(graphics->width(), graphics->height());
+	this->sha_map_ = graphics->CreateR32Map(graphics->width(), graphics->height());
 	
 	this->dsv_ = graphics->CreateDepthStencil(graphics->width(), graphics->height());
 	this->vp_ = graphics->CreateViewPort(graphics->width(), graphics->height());
@@ -21,23 +22,34 @@ void RenderingSystem::Initialize(void)
 	this->shader_post_effects_ = graphics->CreateShader("../posteffects.hlsl");
 	this->shader_backbuffer_ = graphics->CreateShader("../backbuffer3d.hlsl");
 	this->shader_deffered_ = graphics->CreateShader("../deffered3d.hlsl");
+	this->shader_shadow_ = graphics->CreateShader("../shadowmap.hlsl");
 
 	graphics->SetViewPort(this->vp_);
 }
 
 void RenderingSystem::Begin(Seed::Graphics & graphics)
 {
-	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, { this->dsv_ });
-	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_ }, this->dsv_);
+	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_, this->sha_map_ }, { this->dsv_ });
 
-	graphics.SetDirectionLight(this->dir_light_);
-	
-	graphics.SetShader(this->shader_deffered_);
+	graphics.SetDirectionLight(this->dir_light_);	
 }
 
 void RenderingSystem::Render(Seed::Graphics & graphics)
 {
+	graphics.SetTarget({ this->sha_map_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_shadow_);
+
 	graphics.UpdateMainConstantBuffer();
+
+	for (auto & model : this->model_list_)
+		this->Rendering(graphics, model);
+
+	graphics.ClearTarget({}, { this->dsv_ });
+
+	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_deffered_);
 
 	for (auto & model : this->model_list_)
 		this->Rendering(graphics, model);
@@ -47,11 +59,13 @@ void RenderingSystem::Render(Seed::Graphics & graphics)
 
 void RenderingSystem::End(Seed::Graphics & graphics)
 {
+	graphics.ClearTarget({}, { this->dsv_ });
+
 	graphics.SetTarget({ this->dep_map_ }, this->dsv_);
 
 	graphics.SetShader(this->shader_backbuffer_);
 
-	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_ });
+	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_, this->sha_map_ });
 
 	graphics.ClearTarget({ }, { this->dsv_ });
 

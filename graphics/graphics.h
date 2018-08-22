@@ -42,6 +42,7 @@ namespace Seed
 		const unsigned int CreateColorMap(const unsigned int & width, const unsigned int & height);
 		const unsigned int CreatePositionMap(const unsigned int & width, const unsigned int & height);
 		const unsigned int CreateNormalMap(const unsigned int & width, const unsigned int & height);
+		const unsigned int CreateR32Map(const unsigned int & width, const unsigned int & height);
 		void UnloadRenderTarget(const unsigned int & key);
 
 		// - DepthStencil
@@ -62,6 +63,10 @@ namespace Seed
 
 		// Setup
 	public:
+		void CCW(void);
+		void CW(void);
+		void CullNone(void);
+
 		void EnableWireFrame(const bool & enable);
 		void ClearTarget(const std::vector<unsigned int> & render_targets, const std::vector<unsigned int> & depth_stencil);
 		void SetViewPort(const unsigned int & view_port);
@@ -78,6 +83,7 @@ namespace Seed
 		void SetEye(const DirectX::Vector3 & eye);
 		void SetDirectionLight(const DirectX::Vector3 & dir_light);
 		void SetDiffuse(const DirectX::Vector4 & color);
+		void SetRTSRV(const std::vector<unsigned int> & render_targets);
 
 	private:
 		// Private implementation.

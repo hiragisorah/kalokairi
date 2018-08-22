@@ -3,8 +3,10 @@
 Texture2D color_tex : register(t0);
 Texture2D position_tex : register(t1);
 Texture2D normal_depth_tex : register(t2);
+Texture2D shadow_map_tex : register(t3);
 
 SamplerState own_sampler : register(s0);
+SamplerComparisonState own_sampler_cmp : register(s1);
 
 struct VsOut
 {
@@ -52,7 +54,42 @@ PsOut PS(VsOut input)
     float4 position_ = position_tex.Sample(own_sampler, input.uv_);
     float3 normal_ = normal_depth_tex.Sample(own_sampler, input.uv_).xyz;
     float depth_ = normal_depth_tex.Sample(own_sampler, input.uv_).w;
+    float4 shadow_map_ = shadow_map_tex.Sample(own_sampler, input.uv_);
     // GBuffer -
+
+    matrix lp = mul(g_light_view, g_light_proj);
+    matrix lpt = mul(g_light_view, mul(g_light_proj, g_tex_uv));
+
+    //
+    //ライトビューを参照するとき、手がかりとなるテクスチャー座標
+    float4 light_uv = mul(position_, lpt); //この点が、ライトビューであったときの位置がわかる
+	//ライトビューにおける位置(変換後)
+    float4 light_pos = mul(position_, lp);
+    //
+
+    float3 shadowCoord = light_uv.xyz / light_uv.w;
+
+    float maxDepthSlope = max(abs(ddx(shadowCoord.z)), abs(ddy(shadowCoord.z)));
+
+    float shadowThreshold = 1.0f; // シャドウにするかどうかの閾値です.
+
+    float bias = 0.01f; // 固定バイアスです.
+
+    float slopeScaledBias = 0.01f; // 深度傾斜.
+
+    float depthBiasClamp = 0.1f; // バイアスクランプ値.
+
+    float shadowBias = bias + slopeScaledBias * maxDepthSlope;
+
+    shadowBias = min(shadowBias, depthBiasClamp);
+
+    float3 shadowColor = 1;
+
+    shadowThreshold = shadow_map_tex.SampleCmpLevelZero(own_sampler_cmp, shadowCoord.xy, shadowCoord.z - shadowBias);
+
+    shadowColor = lerp(shadowColor, float3(0.3f, 0.3f, 0.3f), 1.f - shadowThreshold);
+
+    color_.xyz *= shadowColor.xyz;
 
     // 陰影 
     float3 light_dir = normalize(g_dir_light - position_.xyz);
@@ -95,6 +132,9 @@ PsOut PS(VsOut input)
     // outline -
 
     output.color_ = color_ * l * out_line;
+
+    //output.color_ = shadow_;
+    //output.color_ = shadow_map_;
 
     return output;
 }

@@ -80,7 +80,7 @@ struct ItemData
 		ar(self, parent,
 			position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, scale.x, scale.y, scale.z,
 			offset_position.x, offset_position.y, offset_position.z, offset_rotation.x, offset_rotation.y, offset_rotation.z, offset_scale.x, offset_scale.y, offset_scale.z,
-			-1, primitive_type, plane_div_x, plane_div_y, plane_size.x, plane_size.y, box_size.x, box_size.y,
+			-1, primitive_type, plane_div_x, plane_div_y, plane_size.x, plane_size.y, box_size.x, box_size.y, box_size.z,
 			sphere_tessellation, sphere_diameter, geosphere_tessellation, geosphere_diameter,
 			capsule_p1.x, capsule_p1.y, capsule_p1.z, capsule_p2.x, capsule_p2.y, capsule_p2.z,
 			capsule_tessellation, capsule_diameter, name);
