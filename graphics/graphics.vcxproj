@@ -26,6 +26,7 @@
     <ClInclude Include="render-target.h" />
     <ClInclude Include="resource-pool.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="texture.h" />
     <ClInclude Include="view-port.h" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +107,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

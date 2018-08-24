@@ -1,5 +1,4 @@
 #include "geometry.h"
-#include "geometry.h"
 
 #include <DirectXPackedVector.h>
 #include <map>

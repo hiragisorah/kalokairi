@@ -19,9 +19,13 @@ QtGui::QtGui(QWidget *parent)
 	auto width = widget->width();
 	auto height = widget->height();
 
+	timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(Update()));
+	timer->start(1000 / 60);
+
 	graphics.Initialize(handle, width, height);
 
-	this->dir_light_ = DirectX::Vector3(0, -100, 50);
+	this->dir_light_ = DirectX::Vector3(0, 8, -8);
 
 	this->backbuffer_ = graphics.CreateBackBuffer();
 
@@ -29,32 +33,35 @@ QtGui::QtGui(QWidget *parent)
 	this->pos_map_ = graphics.CreatePositionMap(graphics.width(), graphics.height());
 	this->nor_map_ = graphics.CreateNormalMap(graphics.width(), graphics.height());
 	this->dep_map_ = graphics.CreateNormalMap(graphics.width(), graphics.height());
+	this->sha_map_ = graphics.CreateR32Map(graphics.width(), graphics.height());
 
 	this->dsv_ = graphics.CreateDepthStencil(graphics.width(), graphics.height());
 	this->vp_ = graphics.CreateViewPort(graphics.width(), graphics.height());
 
+	this->shader_post_effects_ = graphics.CreateShader("../posteffects.hlsl");
+	this->shader_shadow_ = graphics.CreateShader("../shadowmap.hlsl");
 	this->shader_backbuffer_ = graphics.CreateShader("../backbuffer3d.hlsl");
 	this->shader_deffered_ = graphics.CreateShader("../deffered3d.hlsl");
 
-	graphics.SetEye(DirectX::Vector3(0, 5, -5));
-	graphics.SetView(DirectX::Matrix::CreateLookAt(DirectX::Vector3(0, 5, -5), DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0)));
+	graphics.SetEye(DirectX::Vector3(0, 2.f, -5.f));
+	graphics.SetView(DirectX::Matrix::CreateLookAt(DirectX::Vector3(0, 2.f, -5.f), DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0)));
 	graphics.SetProjection(DirectX::Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PIDIV4,
 		static_cast<float>(graphics.width()) / static_cast<float>(graphics.height()), 0.3f, 1000.f));
+
 	graphics.SetViewPort(this->vp_);
 }
 
-void QtGui::paintEvent(QPaintEvent * ev)
+void QtGui::Update(void)
 {
-	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, { this->dsv_ });
-	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ }, this->dsv_);
+	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_, this->sha_map_ }, { this->dsv_ });
 
 	graphics.SetDirectionLight(this->dir_light_);
 
-	graphics.SetShader(this->shader_deffered_);
+	graphics.SetTarget({ this->sha_map_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_shadow_);
 
 	graphics.UpdateMainConstantBuffer();
-
-	graphics.EnableWireFrame(this->wire_frame_);
 
 	for (int i = 0; i < ui.parts_list->count(); ++i)
 	{
@@ -88,10 +95,58 @@ void QtGui::paintEvent(QPaintEvent * ev)
 				parent = p.parent;
 			}
 
+			graphics.SetWorld(offset * world);
+
+			graphics.UpdateModelConstantBuffer();
+
+			graphics.Draw(item.primitive_id);
+		}
+	}
+
+	graphics.ClearTarget({}, { this->dsv_ });
+
+	graphics.SetTarget({ this->col_map_, this->pos_map_, this->nor_map_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_deffered_);
+
+	graphics.EnableWireFrame(this->wire_frame_);
+
+	for (int i = 0; i < ui.parts_list->count(); ++i)
+	{
+		auto & item = main_data[item_no[i]];
+
+		if (item.primitive_id != -1)
+		{
+			auto offset
+				= DirectX::XMMatrixScaling(item.offset_scale.x, item.offset_scale.y, item.offset_scale.z)
+				* DirectX::XMMatrixRotationRollPitchYaw(item.offset_rotation.x, item.offset_rotation.y, item.offset_rotation.z)
+				* DirectX::XMMatrixTranslation(item.offset_position.x, item.offset_position.y, item.offset_position.z);
+
+			auto world
+				= DirectX::XMMatrixScaling(item.scale.x, item.scale.y, item.scale.z)
+				* DirectX::XMMatrixRotationRollPitchYaw(item.rotation.x, item.rotation.y, item.rotation.z)
+				* DirectX::XMMatrixTranslation(item.position.x, item.position.y, item.position.z);
+
+			auto parent = item.parent;
+
+			while (parent != -1)
+			{
+				auto & p = main_data[parent];
+
+				auto p_world
+					= DirectX::XMMatrixScaling(p.scale.x, p.scale.y, p.scale.z)
+					* DirectX::XMMatrixRotationRollPitchYaw(p.rotation.x, p.rotation.y, p.rotation.z)
+					* DirectX::XMMatrixTranslation(p.position.x, p.position.y, p.position.z);
+
+				world *= p_world;
+
+				parent = p.parent;
+			}
+
 			if (i == ui.parts_list->currentRow())
-				graphics.SetDiffuse(DirectX::Vector4(1, .8f, .8f, 1));
+				graphics.SetDiffuse(DirectX::Vector4(1.f, .7f, .7f, 1));
 			else
-				graphics.SetDiffuse(DirectX::Vector4(1, 1, 1, 0.5f));
+				graphics.SetDiffuse(DirectX::Vector4(1.f, 1.f, 1.f, 1.f));
 
 			graphics.SetWorld(offset * world);
 
@@ -103,9 +158,19 @@ void QtGui::paintEvent(QPaintEvent * ev)
 
 	graphics.EnableWireFrame(false);
 
-	graphics.SetTarget({ this->backbuffer_ }, this->dsv_);
+	graphics.ClearTarget({}, { this->dsv_ });
+
+	graphics.SetTarget({ this->dep_map_ }, this->dsv_);
 
 	graphics.SetShader(this->shader_backbuffer_);
+
+	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_, this->sha_map_ });
+
+	graphics.ClearTarget({}, { this->dsv_ });
+
+	graphics.SetTarget({ this->backbuffer_ }, this->dsv_);
+
+	graphics.SetShader(this->shader_post_effects_);
 
 	graphics.DrawScreen({ this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_ });
 

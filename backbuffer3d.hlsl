@@ -59,11 +59,8 @@ PsOut PS(VsOut input)
 
     matrix lp = mul(g_light_view, g_light_proj);
     matrix lpt = mul(g_light_view, mul(g_light_proj, g_tex_uv));
-
-    //
-    //ライトビューを参照するとき、手がかりとなるテクスチャー座標
-    float4 light_uv = mul(position_, lpt); //この点が、ライトビューであったときの位置がわかる
-	//ライトビューにおける位置(変換後)
+    
+    float4 light_uv = mul(position_, lpt);
     float4 light_pos = mul(position_, lp);
     //
 
@@ -71,13 +68,12 @@ PsOut PS(VsOut input)
 
     float maxDepthSlope = max(abs(ddx(shadowCoord.z)), abs(ddy(shadowCoord.z)));
 
-    float shadowThreshold = 1.0f; // シャドウにするかどうかの閾値です.
+    float shadowThreshold = 1.0f;
 
-    float bias = 0.01f; // 固定バイアスです.
+    float bias = 0.02f;
+    float slopeScaledBias = 0.1f;
 
-    float slopeScaledBias = 0.01f; // 深度傾斜.
-
-    float depthBiasClamp = 0.1f; // バイアスクランプ値.
+    float depthBiasClamp = 0.08f;
 
     float shadowBias = bias + slopeScaledBias * maxDepthSlope;
 
@@ -106,6 +102,7 @@ PsOut PS(VsOut input)
 
     // - トゥーン（3値化?）
     float l = max(0.0f, dotL);
+
     l = min(lerp(step(0.02f, l) * 0.3f, 0.4f, step(0.5, l)) + 0.5f, 1.0);
 
     // トゥーン（3値化?） - 

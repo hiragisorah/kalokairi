@@ -7,8 +7,8 @@ Camera::Camera(void)
 	, up_(0,1,0)
 	, fov_(DirectX::XM_PIDIV4)
 	, aspect_(1280.f / 720.f)
-	, near_(0.3f)
-	, far_(1000.f)
+	, near_(0.5f)
+	, far_(20.f)
 	, target_(nullptr)
 {
 }
@@ -27,7 +27,6 @@ void Camera::Update(void)
 	if (this->target_)
 	{
 		auto position = this->target_->FinalMatrix().Translation();
-		auto back = this->target_->FinalMatrix().Backward();
 		this->at_ = DirectX::Vector3::Lerp(this->eye_, position, 0.1f);
 		//this->eye_ = DirectX::Vector3::Lerp(this->eye_, position + back * 5.f + DirectX::Vector3(0, 1.f, 0), 0.05f);
 		this->eye_ = DirectX::Vector3::Lerp(this->eye_, position - DirectX::Vector3(0, -2.f, 5.f), 0.05f);
@@ -37,6 +36,8 @@ void Camera::Update(void)
 
 void Camera::Always(void)
 {
+	this->dir_light_ = DirectX::Vector3(0, 8, -8);
+	this->dir_light_.x += this->eye_.x;
 }
 
 void Camera::Finalize(void)
@@ -48,6 +49,7 @@ void Camera::Begin(Seed::Graphics & graphics)
 	graphics.SetView(this->View());
 	graphics.SetProjection(this->Projection());
 	graphics.SetEye(this->eye_);
+	graphics.SetDirectionLight(this->dir_light_);
 }
 
 void Camera::End(Seed::Graphics & graphics)

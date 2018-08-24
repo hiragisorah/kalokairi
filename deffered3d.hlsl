@@ -44,11 +44,6 @@ VsOut VS(VsIn input)
 
 float isDithered(float2 pos, float alpha)
 {
-
-
-    // Define a dither threshold matrix which can
-    // be used to define how a 4x4 set of pixels
-    // will be dithered
     float DITHER_THRESHOLDS[16] =
     {
         1.0 / 17.0, 9.0 / 17.0, 3.0 / 17.0, 11.0 / 17.0,

@@ -23,6 +23,9 @@ public:
 	void End(Seed::Graphics & graphics) override;
 
 private:
+	DirectX::Vector3 dir_light_;
+
+private:
 	DirectX::Vector3 eye_;
 	DirectX::Vector3 at_;
 	DirectX::Vector3 up_;

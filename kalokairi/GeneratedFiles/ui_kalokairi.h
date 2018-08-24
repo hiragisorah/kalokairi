@@ -13,8 +13,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMenuBar>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -26,8 +24,6 @@ public:
     QAction *actionReset;
     QAction *actionShutdown;
     QWidget *centralWidget;
-    QMenuBar *menuBar;
-    QMenu *menuFile;
 
     void setupUi(QMainWindow *KalokairiClass)
     {
@@ -53,19 +49,6 @@ public:
         sizePolicy.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
         centralWidget->setSizePolicy(sizePolicy);
         KalokairiClass->setCentralWidget(centralWidget);
-        menuBar = new QMenuBar(KalokairiClass);
-        menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setEnabled(true);
-        menuBar->setGeometry(QRect(0, 0, 1280, 26));
-        menuFile = new QMenu(menuBar);
-        menuFile->setObjectName(QStringLiteral("menuFile"));
-        menuFile->setEnabled(true);
-        KalokairiClass->setMenuBar(menuBar);
-
-        menuBar->addAction(menuFile->menuAction());
-        menuFile->addAction(actionLaunch);
-        menuFile->addAction(actionReset);
-        menuFile->addAction(actionShutdown);
 
         retranslateUi(KalokairiClass);
 
@@ -78,7 +61,6 @@ public:
         actionLaunch->setText(QApplication::translate("KalokairiClass", "Launch", nullptr));
         actionReset->setText(QApplication::translate("KalokairiClass", "Reset", nullptr));
         actionShutdown->setText(QApplication::translate("KalokairiClass", "Shutdown", nullptr));
-        menuFile->setTitle(QApplication::translate("KalokairiClass", "File", nullptr));
     } // retranslateUi
 
 };

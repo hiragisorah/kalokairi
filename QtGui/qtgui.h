@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 
 #include <QtWidgets/QMainWindow>
+#include <QTimer>
 #include <unordered_map>
 
 #include "ui_qtgui.h"
@@ -22,9 +23,7 @@ public:
 	
 private:
 	Seed::Graphics graphics;
-
-protected:
-	void paintEvent(QPaintEvent * ev);
+	QTimer * timer;
 
 private:
 	std::unordered_map<int, ItemData> main_data;
@@ -34,6 +33,8 @@ private:
 	ItemData & GetData(int no);
 
 private slots:
+	void Update(void);
+
 	void on_add_button_pressed(void);
 
 	void on_delete_button_pressed(void);
@@ -100,8 +101,10 @@ private slots:
 	void actionExport(void);
 
 private:
+	unsigned int shader_post_effects_;
 	unsigned int shader_backbuffer_;
 	unsigned int shader_deffered_;
+	unsigned int shader_shadow_;
 
 	unsigned int backbuffer_;
 
@@ -109,6 +112,7 @@ private:
 	unsigned int pos_map_;
 	unsigned int nor_map_;
 	unsigned int dep_map_;
+	unsigned int sha_map_;
 
 	unsigned int dsv_;
 	unsigned int vp_;

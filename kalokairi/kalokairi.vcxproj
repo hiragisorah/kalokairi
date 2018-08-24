@@ -131,6 +131,7 @@
     <ClCompile Include="rendering_system.cpp" />
     <ClCompile Include="screen.cpp" />
     <ClCompile Include="stage.cpp" />
+    <ClCompile Include="stage_event.cpp" />
     <ClCompile Include="transform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="rendering_system.h" />
     <ClInclude Include="screen.h" />
     <ClInclude Include="stage.h" />
+    <ClInclude Include="stage_event.h" />
     <ClInclude Include="transform.h" />
   </ItemGroup>
   <ItemGroup>

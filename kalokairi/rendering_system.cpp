@@ -6,8 +6,6 @@ void RenderingSystem::Initialize(void)
 {
 	auto graphics = this->owner()->engine()->graphics();
 
-	this->dir_light_ = DirectX::Vector3(0, -25, 25);
-
 	this->backbuffer_ = graphics->CreateBackBuffer();
 	
 	this->col_map_ = graphics->CreateColorMap(graphics->width(), graphics->height());
@@ -23,21 +21,19 @@ void RenderingSystem::Initialize(void)
 	this->shader_backbuffer_ = graphics->CreateShader("../backbuffer3d.hlsl");
 	this->shader_deffered_ = graphics->CreateShader("../deffered3d.hlsl");
 	this->shader_shadow_ = graphics->CreateShader("../shadowmap.hlsl");
-
-	graphics->SetViewPort(this->vp_);
 }
 
 void RenderingSystem::Begin(Seed::Graphics & graphics)
 {
 	graphics.ClearTarget({ this->backbuffer_, this->col_map_, this->pos_map_, this->nor_map_, this->dep_map_, this->sha_map_ }, { this->dsv_ });
-
-	graphics.SetDirectionLight(this->dir_light_);	
+	
+	graphics.SetViewPort(this->vp_);
 }
 
 void RenderingSystem::Render(Seed::Graphics & graphics)
 {
 	graphics.SetTarget({ this->sha_map_ }, this->dsv_);
-
+	
 	graphics.SetShader(this->shader_shadow_);
 
 	graphics.UpdateMainConstantBuffer();

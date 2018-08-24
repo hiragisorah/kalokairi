@@ -184,7 +184,7 @@ public:
     {
         if (QtGuiClass->objectName().isEmpty())
             QtGuiClass->setObjectName(QStringLiteral("QtGuiClass"));
-        QtGuiClass->resize(1360, 706);
+        QtGuiClass->resize(1361, 706);
         QFont font;
         font.setFamily(QString::fromUtf8("\343\203\241\343\202\244\343\203\252\343\202\252"));
         QtGuiClass->setFont(font);
@@ -261,7 +261,7 @@ public:
         groupBox_6->setGeometry(QRect(10, 180, 291, 61));
         horizontalLayoutWidget_4 = new QWidget(groupBox_6);
         horizontalLayoutWidget_4->setObjectName(QStringLiteral("horizontalLayoutWidget_4"));
-        horizontalLayoutWidget_4->setGeometry(QRect(10, 20, 270, 31));
+        horizontalLayoutWidget_4->setGeometry(QRect(10, 20, 271, 31));
         horizontalLayout_5 = new QHBoxLayout(horizontalLayoutWidget_4);
         horizontalLayout_5->setSpacing(6);
         horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
@@ -320,7 +320,7 @@ public:
         groupBox_4->setGeometry(QRect(10, 60, 291, 61));
         horizontalLayoutWidget = new QWidget(groupBox_4);
         horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
-        horizontalLayoutWidget->setGeometry(QRect(10, 20, 271, 31));
+        horizontalLayoutWidget->setGeometry(QRect(10, 20, 291, 31));
         horizontalLayout_2 = new QHBoxLayout(horizontalLayoutWidget);
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
@@ -336,8 +336,8 @@ public:
         position_x->setWrapping(false);
         position_x->setProperty("showGroupSeparator", QVariant(false));
         position_x->setDecimals(2);
-        position_x->setMinimum(-5);
-        position_x->setMaximum(5);
+        position_x->setMinimum(-99);
+        position_x->setMaximum(99);
         position_x->setSingleStep(0.01);
 
         horizontalLayout_2->addWidget(position_x);
@@ -352,8 +352,8 @@ public:
         position_y->setWrapping(false);
         position_y->setProperty("showGroupSeparator", QVariant(false));
         position_y->setDecimals(2);
-        position_y->setMinimum(-5);
-        position_y->setMaximum(5);
+        position_y->setMinimum(-99);
+        position_y->setMaximum(99);
         position_y->setSingleStep(0.01);
 
         horizontalLayout_2->addWidget(position_y);
@@ -368,8 +368,8 @@ public:
         position_z->setWrapping(false);
         position_z->setProperty("showGroupSeparator", QVariant(false));
         position_z->setDecimals(2);
-        position_z->setMinimum(-5);
-        position_z->setMaximum(5);
+        position_z->setMinimum(-99);
+        position_z->setMaximum(99);
         position_z->setSingleStep(0.01);
 
         horizontalLayout_2->addWidget(position_z);
@@ -447,7 +447,7 @@ public:
         groupBox_16->setGeometry(QRect(10, 0, 291, 61));
         horizontalLayoutWidget_17 = new QWidget(groupBox_16);
         horizontalLayoutWidget_17->setObjectName(QStringLiteral("horizontalLayoutWidget_17"));
-        horizontalLayoutWidget_17->setGeometry(QRect(10, 20, 271, 31));
+        horizontalLayoutWidget_17->setGeometry(QRect(10, 20, 291, 31));
         horizontalLayout_18 = new QHBoxLayout(horizontalLayoutWidget_17);
         horizontalLayout_18->setSpacing(6);
         horizontalLayout_18->setContentsMargins(11, 11, 11, 11);
@@ -463,8 +463,8 @@ public:
         offset_position_x->setWrapping(false);
         offset_position_x->setProperty("showGroupSeparator", QVariant(false));
         offset_position_x->setDecimals(2);
-        offset_position_x->setMinimum(-5);
-        offset_position_x->setMaximum(5);
+        offset_position_x->setMinimum(-99);
+        offset_position_x->setMaximum(99);
         offset_position_x->setSingleStep(0.01);
 
         horizontalLayout_18->addWidget(offset_position_x);
@@ -479,8 +479,8 @@ public:
         offset_position_y->setWrapping(false);
         offset_position_y->setProperty("showGroupSeparator", QVariant(false));
         offset_position_y->setDecimals(2);
-        offset_position_y->setMinimum(-5);
-        offset_position_y->setMaximum(5);
+        offset_position_y->setMinimum(-99);
+        offset_position_y->setMaximum(99);
         offset_position_y->setSingleStep(0.01);
 
         horizontalLayout_18->addWidget(offset_position_y);
@@ -495,8 +495,8 @@ public:
         offset_position_z->setWrapping(false);
         offset_position_z->setProperty("showGroupSeparator", QVariant(false));
         offset_position_z->setDecimals(2);
-        offset_position_z->setMinimum(-5);
-        offset_position_z->setMaximum(5);
+        offset_position_z->setMinimum(-99);
+        offset_position_z->setMaximum(99);
         offset_position_z->setSingleStep(0.01);
 
         horizontalLayout_18->addWidget(offset_position_z);
@@ -630,10 +630,10 @@ public:
         tab->setObjectName(QStringLiteral("tab"));
         groupBox_7 = new QGroupBox(tab);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
-        groupBox_7->setGeometry(QRect(10, 10, 271, 61));
+        groupBox_7->setGeometry(QRect(10, 10, 281, 61));
         horizontalLayoutWidget_5 = new QWidget(groupBox_7);
         horizontalLayoutWidget_5->setObjectName(QStringLiteral("horizontalLayoutWidget_5"));
-        horizontalLayoutWidget_5->setGeometry(QRect(10, 20, 251, 31));
+        horizontalLayoutWidget_5->setGeometry(QRect(10, 20, 268, 31));
         horizontalLayout_6 = new QHBoxLayout(horizontalLayoutWidget_5);
         horizontalLayout_6->setSpacing(6);
         horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
@@ -649,7 +649,7 @@ public:
         plane_size_x->setWrapping(false);
         plane_size_x->setProperty("showGroupSeparator", QVariant(false));
         plane_size_x->setDecimals(2);
-        plane_size_x->setMaximum(10);
+        plane_size_x->setMaximum(300);
         plane_size_x->setSingleStep(0.01);
 
         horizontalLayout_6->addWidget(plane_size_x);
@@ -664,7 +664,7 @@ public:
         plane_size_y->setWrapping(false);
         plane_size_y->setProperty("showGroupSeparator", QVariant(false));
         plane_size_y->setDecimals(2);
-        plane_size_y->setMaximum(10);
+        plane_size_y->setMaximum(300);
         plane_size_y->setSingleStep(0.01);
 
         horizontalLayout_6->addWidget(plane_size_y);
@@ -714,7 +714,7 @@ public:
         groupBox_10->setGeometry(QRect(10, 10, 291, 61));
         horizontalLayoutWidget_7 = new QWidget(groupBox_10);
         horizontalLayoutWidget_7->setObjectName(QStringLiteral("horizontalLayoutWidget_7"));
-        horizontalLayoutWidget_7->setGeometry(QRect(10, 20, 293, 31));
+        horizontalLayoutWidget_7->setGeometry(QRect(10, 20, 318, 31));
         horizontalLayout_8 = new QHBoxLayout(horizontalLayoutWidget_7);
         horizontalLayout_8->setSpacing(6);
         horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
@@ -730,8 +730,8 @@ public:
         box_size_x->setWrapping(false);
         box_size_x->setProperty("showGroupSeparator", QVariant(false));
         box_size_x->setDecimals(3);
-        box_size_x->setMinimum(-5);
-        box_size_x->setMaximum(5);
+        box_size_x->setMinimum(-50);
+        box_size_x->setMaximum(50);
         box_size_x->setSingleStep(0.01);
 
         horizontalLayout_8->addWidget(box_size_x);
@@ -746,8 +746,8 @@ public:
         box_size_y->setWrapping(false);
         box_size_y->setProperty("showGroupSeparator", QVariant(false));
         box_size_y->setDecimals(3);
-        box_size_y->setMinimum(-5);
-        box_size_y->setMaximum(5);
+        box_size_y->setMinimum(-50);
+        box_size_y->setMaximum(50);
         box_size_y->setSingleStep(0.01);
 
         horizontalLayout_8->addWidget(box_size_y);
@@ -762,8 +762,8 @@ public:
         box_size_z->setWrapping(false);
         box_size_z->setProperty("showGroupSeparator", QVariant(false));
         box_size_z->setDecimals(3);
-        box_size_z->setMinimum(-5);
-        box_size_z->setMaximum(5);
+        box_size_z->setMinimum(-50);
+        box_size_z->setMaximum(50);
         box_size_z->setSingleStep(0.01);
 
         horizontalLayout_8->addWidget(box_size_z);
@@ -967,7 +967,7 @@ public:
         QtGuiClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QtGuiClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1360, 26));
+        menuBar->setGeometry(QRect(0, 0, 1361, 26));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         QtGuiClass->setMenuBar(menuBar);

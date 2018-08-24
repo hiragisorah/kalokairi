@@ -85,7 +85,7 @@ public:
 	{
 		ModelCB(void)
 			: world_(DirectX::XMMatrixIdentity())
-			, color_({ 1, 1, 1, 0.5f })
+			, color_({ 1, 1, 1, 1.f })
 		{}
 
 		DirectX::XMMATRIX world_;
@@ -476,24 +476,15 @@ void Seed::Graphics::Impl::Initialize(void)
 
 	this->main_cb_.view_port_ = { static_cast<float>(this->width_), static_cast<float>(this->height_) };
 
-
 	this->main_cb_.tex_uv_.r[0] = DirectX::XMVectorSet(+.5f, +.0f, .0f, .0f);
 	this->main_cb_.tex_uv_.r[1] = DirectX::XMVectorSet(+.0f, -.5f, .0f, .0f);
 	this->main_cb_.tex_uv_.r[2] = DirectX::XMVectorSet(+.0f, +.0f, 1.f, .0f);
 	this->main_cb_.tex_uv_.r[3] = DirectX::XMVectorSet(+.5f, +.5f, .0f, 1.f);
-
-	//this->main_cb_.tex_uv_._m[1][1] = 0.5;
-	//m_mClipToUV._22 = -0.5;
-	//m_mClipToUV._33 = 1;
-	//m_mClipToUV._41 = 0.5;
-	//m_mClipToUV._42 = 0.5;
-	//m_mClipToUV._44 = 1;
 ;
-	this->main_cb_.light_view_ = DirectX::Matrix::CreateLookAt(DirectX::Vector3(0, 10.f, -10), DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0));
-	this->main_cb_.light_proj_ = DirectX::Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PIDIV4, static_cast<float>(this->width_) / static_cast<float>(this->height_), 5.0f, 30.f);
-	//this->main_cb_.light_view_ = DirectX::XMMatrixInverse(nullptr, this->main_cb_.light_view_);
-	//this->main_cb_.light_view_ = DirectX::XMMatrixInverse(nullptr, this->main_cb_.light_view_);
-
+	this->main_cb_.light_view_ = DirectX::Matrix::CreateLookAt(DirectX::Vector3(0, 8.f, -8), DirectX::Vector3::Zero, DirectX::Vector3(0, 1, 0));
+	//this->main_cb_.light_proj_ = DirectX::Matrix::CreatePerspectiveFieldOfView(DirectX::XM_PIDIV4, static_cast<float>(this->width_) / static_cast<float>(this->height_), 5.0f, 20.f);
+	this->main_cb_.light_proj_ = DirectX::Matrix::CreateOrthographic(20, 15, 2.0f, 16.f);
+	
 	D3D11_SAMPLER_DESC desc = {};
 	desc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
 	desc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
@@ -508,8 +499,7 @@ void Seed::Graphics::Impl::Initialize(void)
 	desc.MipLODBias = 0;
 	desc.MinLOD = -FLT_MAX;
 	desc.MaxLOD = +FLT_MAX;
-	
-	 // サンプラーステートを生成.
+
 	device->CreateSamplerState(&desc, &this->cmp_);
 
 	this->device_context_->PSSetSamplers(1, 1, this->cmp_.GetAddressOf());
@@ -781,7 +771,10 @@ void Seed::Graphics::Impl::SetLightView(const DirectX::XMMATRIX & light_view)
 
 void Seed::Graphics::Impl::SetDirectionLight(const DirectX::Vector3 & dir_light)
 {
-	this->main_cb_.dir_light_ = { dir_light.x, dir_light.y, dir_light.z };
+	this->main_cb_.dir_light_ = { dir_light.x, -dir_light.y, -dir_light.z };
+	DirectX::Vector3 x_only(1, 0, 0);
+	
+	this->main_cb_.light_view_ = DirectX::Matrix::CreateLookAt(dir_light, x_only * dir_light + DirectX::Vector3(-1, 0, 0), DirectX::Vector3(0, 1, 0));
 }
 
 void Seed::Graphics::Impl::SetDiffuse(const DirectX::Vector4 & color)

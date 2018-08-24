@@ -99,6 +99,9 @@
     <ClCompile Include="bullet_movement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stage_event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="kalokairi.h">
@@ -162,6 +165,9 @@
       <Filter>Header Files\entity</Filter>
     </ClInclude>
     <ClInclude Include="bullet_movement.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="stage_event.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>
