@@ -21,7 +21,6 @@ namespace Seed
 		}
 		const bool Initialize(void);
 
-
 	private:
 		Scene * current_scene_;
 		Scene * next_scene_;

@@ -519,6 +519,7 @@ public:
         eye_y->setMinimum(-10);
         eye_y->setMaximum(10);
         eye_y->setSingleStep(0.01);
+        eye_y->setValue(2);
 
         horizontalLayout_8->addWidget(eye_y);
 
@@ -535,6 +536,7 @@ public:
         eye_z->setMinimum(-10);
         eye_z->setMaximum(10);
         eye_z->setSingleStep(0.01);
+        eye_z->setValue(-5);
 
         horizontalLayout_8->addWidget(eye_z);
 

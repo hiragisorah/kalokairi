@@ -23,6 +23,11 @@ namespace Seed
 
 		virtual ~Texture(void);
 
+	public:
+		const unsigned int & width(void);
+		const unsigned int & height(void);
+		ID3D11ShaderResourceView * const GetSRV(void) const;
+
 		// Factory
 	private:
 		static std::unique_ptr<Texture> Load(const DeviceContext & device_context, const std::string & file_name);

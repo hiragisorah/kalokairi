@@ -1,12 +1,11 @@
 #include "graphics.h"
-#include "graphics.h"
-#include "graphics.h"
 
 #include "depth-stencil.h"
 #include "geometry.h"
 #include "render-target.h"
 #include "shader.h"
 #include "view-port.h"
+#include "texture.h"
 
 #include "resource-pool.h"
 
@@ -26,10 +25,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> ccw_;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> cw_;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> cull_none_;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state_;
 
 public:
 	void Initialize(void);
-	void Run(void);
+	const bool Run(void);
 	void Finalize(void);
 
 private:
@@ -55,6 +55,7 @@ private:
 	ResourcePool<ViewPort> view_port_pool_;
 	ResourcePool<Shader> shader_pool_;
 	ResourcePool<Geometry> geometry_pool_;
+	ResourcePool<Texture> texture_pool_;
 
 public:
 	struct MainCB
@@ -67,6 +68,7 @@ public:
 			, dir_light_({ 0, 0, 0 })
 			, timer_(0)
 			, view_port_({ 0, 0 })
+			, screen_color_({1,1,1,1})
 		{}
 
 		DirectX::XMMATRIX view_;
@@ -78,6 +80,7 @@ public:
 		DirectX::XMFLOAT3A dir_light_;
 		__declspec(align(16)) unsigned int timer_;
 		DirectX::XMFLOAT2A view_port_;
+		DirectX::XMFLOAT4 screen_color_;
 
 	} main_cb_;
 
@@ -85,11 +88,13 @@ public:
 	{
 		ModelCB(void)
 			: world_(DirectX::XMMatrixIdentity())
-			, color_({ 1, 1, 1, 1.f })
+			, color_({ 1, 1, 1, 1 })
+			, screen_({ 1,1,1,1 })
 		{}
 
 		DirectX::XMMATRIX world_;
 		DirectX::XMFLOAT4 color_;
+		DirectX::XMFLOAT4 screen_;
 	} model_cb_;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> cmp_;
@@ -100,6 +105,7 @@ private:
 	const unsigned int LoadDepthStencil(std::unique_ptr<DepthStencil> && depth_stencil);
 	const unsigned int LoadShader(std::unique_ptr<Shader> && shader);
 	const unsigned int LoadGeometry(std::unique_ptr<Geometry> && geometry);
+	const unsigned int LoadTexture(std::unique_ptr<Texture> && texture);
 
 public:
 	const unsigned int CreateViewPort(const unsigned int & width, const unsigned int & height);
@@ -113,12 +119,15 @@ public:
 	const unsigned int CreateDepthStencil(const unsigned int & width, const unsigned int & height);
 
 	const unsigned int CreateShader(const std::string & file_name);
+	const unsigned int CreateTexture(const std::string & file_name);
 
 	const unsigned int CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size = { 1, 1 });
 	const unsigned int CreateBox(const DirectX::XMFLOAT3 & size);
 	const unsigned int CreateSphere(const float & diameter, const unsigned int & tessellation);
 	const unsigned int CreateGeoSphere(const float & diameter, const unsigned int & tessellation);
 	const unsigned int CreateCapsule(const DirectX::XMFLOAT3 & p1, const DirectX::XMFLOAT3 & p2, const float & diameter, const unsigned int & tessellation);
+	
+	const DirectX::Vector2 GetTextureSize(const unsigned int & key);
 
 	void CCW(void);
 	void CW(void);
@@ -129,6 +138,7 @@ public:
 	void UnloadDepthStencil(const unsigned int & key);
 	void UnloadShader(const unsigned int & key);
 	void UnloadGeometry(const unsigned int & key);
+	void UnloadTexture(const unsigned int & key);
 
 	void EnableWireFrame(const bool & enable);
 	void ClearTarget(const std::vector<unsigned int> & render_targets, const std::vector<unsigned int> & depth_stencil);
@@ -139,6 +149,7 @@ public:
 	void UpdateModelConstantBuffer(void);
 	void Draw(const unsigned int & key);
 	void DrawScreen(const std::vector<unsigned int>& render_targets);
+	void DrawTexture(const unsigned int & texture_id);
 
 	void SetWorld(const DirectX::XMMATRIX & world);
 	void SetView(const DirectX::XMMATRIX & view);
@@ -148,6 +159,8 @@ public:
 	void SetDirectionLight(const DirectX::Vector3 & dir_light);
 	void SetDiffuse(const DirectX::Vector4 & color);
 	void SetRTSRV(const std::vector<unsigned int>& render_targets);
+	void SetBlend(const bool & blend);
+	void SetScreenColor(const DirectX::Vector4 & color);
 };
 
 const unsigned int Seed::Graphics::CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size)
@@ -240,6 +253,11 @@ void Seed::Graphics::DrawScreen(const std::vector<unsigned int>& render_targets)
 	this->impl_->DrawScreen(render_targets);
 }
 
+void Seed::Graphics::DrawTexture(const unsigned int & texture_id)
+{
+	this->impl_->DrawTexture(texture_id);
+}
+
 void Seed::Graphics::SetWorld(const DirectX::XMMATRIX & world)
 {
 	this->impl_->SetWorld(world);
@@ -275,6 +293,16 @@ void Seed::Graphics::SetRTSRV(const std::vector<unsigned int>& render_targets)
 	this->impl_->SetRTSRV(render_targets);
 }
 
+void Seed::Graphics::SetBlend(const bool & blend)
+{
+	this->impl_->SetBlend(blend);
+}
+
+void Seed::Graphics::SetScreenColor(const DirectX::Vector4 & color)
+{
+	this->impl_->SetScreenColor(color);
+}
+
 Seed::Graphics::~Graphics(void)
 {
 	
@@ -288,9 +316,9 @@ void Seed::Graphics::Initialize(void * handle, const unsigned int & width, const
 	this->impl_->Initialize();
 }
 
-void Seed::Graphics::Run(void)
+const bool Seed::Graphics::Run(void)
 {
-	this->impl_->Run();
+	return this->impl_->Run();
 }
 
 void Seed::Graphics::Finalize(void)
@@ -341,6 +369,21 @@ const unsigned int Seed::Graphics::CreateShader(const std::string & file_name)
 void Seed::Graphics::UnloadShader(const unsigned int & key)
 {
 	this->impl_->UnloadShader(key);
+}
+
+const DirectX::Vector2 Seed::Graphics::GetTextureSize(const unsigned int & key)
+{
+	return this->impl_->GetTextureSize(key);
+}
+
+const unsigned int Seed::Graphics::CreateTexture(const std::string & file_name)
+{
+	return this->impl_->CreateTexture(file_name);
+}
+
+void Seed::Graphics::UnloadTexture(const unsigned int & key)
+{
+	this->impl_->UnloadTexture(key);
 }
 
 const unsigned int Seed::Graphics::CreateViewPort(const unsigned int & width, const unsigned int & height)
@@ -503,12 +546,32 @@ void Seed::Graphics::Impl::Initialize(void)
 	device->CreateSamplerState(&desc, &this->cmp_);
 
 	this->device_context_->PSSetSamplers(1, 1, this->cmp_.GetAddressOf());
+
+	{
+		D3D11_BLEND_DESC blend_desc = {};
+
+		blend_desc.AlphaToCoverageEnable = false;
+		blend_desc.IndependentBlendEnable = false;
+
+		blend_desc.RenderTarget[0].BlendEnable = true;
+		blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		device->CreateBlendState(&blend_desc, this->blend_state_.GetAddressOf());
+	}
 }
 
-void Seed::Graphics::Impl::Run(void)
+const bool Seed::Graphics::Impl::Run(void)
 {
 	this->main_cb_.timer_++;
 	this->swap_chain_->Present(0, 0);
+	
+	return true;
 }
 
 void Seed::Graphics::Impl::Finalize(void)
@@ -540,7 +603,7 @@ const unsigned int & Seed::Graphics::Impl::height(void)
 	return this->height_;
 }
 
-const unsigned int Seed::Graphics::Impl::LoadViewPort(std::unique_ptr<ViewPort>&& view_port)
+const unsigned int Seed::Graphics::Impl::LoadViewPort(std::unique_ptr<ViewPort> && view_port)
 {
 	return this->view_port_pool_.Load(view_port);
 }
@@ -550,17 +613,22 @@ const unsigned int Seed::Graphics::Impl::LoadGeometry(std::unique_ptr<Geometry> 
 	return this->geometry_pool_.Load(geometry);
 }
 
+const unsigned int Seed::Graphics::Impl::LoadTexture(std::unique_ptr<Texture> && texture)
+{
+	return this->texture_pool_.Load(texture);
+}
+
 const unsigned int Seed::Graphics::Impl::LoadRenderTarget(std::unique_ptr<RenderTarget> && render_target)
 {
 	return this->render_target_pool_.Load(render_target);
 }
 
-const unsigned int Seed::Graphics::Impl::LoadDepthStencil(std::unique_ptr<DepthStencil>&& depth_stencil)
+const unsigned int Seed::Graphics::Impl::LoadDepthStencil(std::unique_ptr<DepthStencil> && depth_stencil)
 {
 	return this->depth_stencil_pool_.Load(depth_stencil);
 }
 
-const unsigned int Seed::Graphics::Impl::LoadShader(std::unique_ptr<Shader>&& shader)
+const unsigned int Seed::Graphics::Impl::LoadShader(std::unique_ptr<Shader> && shader)
 {
 	return this->shader_pool_.Load(shader);
 }
@@ -605,6 +673,11 @@ const unsigned int Seed::Graphics::Impl::CreateShader(const std::string & file_n
 	return this->LoadShader(Shader::Create(this->device_context_, file_name));
 }
 
+const unsigned int Seed::Graphics::Impl::CreateTexture(const std::string & file_name)
+{
+	return this->LoadTexture(Texture::Load(this->device_context_, file_name));
+}
+
 const unsigned int Seed::Graphics::Impl::CreatePlane(const unsigned int & div_x, const unsigned int & div_y, const DirectX::XMFLOAT2 & size)
 {
 	return this->LoadGeometry(Geometry::Plane(this->device_context_, div_x, div_y, size));
@@ -630,6 +703,13 @@ const unsigned int Seed::Graphics::Impl::CreateCapsule(const DirectX::XMFLOAT3 &
 	return this->LoadGeometry(Geometry::Capsule(this->device_context_, p1, p2, diameter, tessellation));
 }
 
+const DirectX::Vector2 Seed::Graphics::Impl::GetTextureSize(const unsigned int & key)
+{
+	auto & texture = this->texture_pool_.Get(key);
+
+	return DirectX::Vector2(texture->width(), texture->height());
+}
+
 void Seed::Graphics::Impl::CCW(void)
 {
 	this->device_context_->RSSetState(this->ccw_.Get());
@@ -653,6 +733,11 @@ void Seed::Graphics::Impl::UnloadViewPort(const unsigned int & key)
 void Seed::Graphics::Impl::UnloadGeometry(const unsigned int & key)
 {
 	this->geometry_pool_.Unload(key);
+}
+
+void Seed::Graphics::Impl::UnloadTexture(const unsigned int & key)
+{
+	this->texture_pool_.Unload(key);
 }
 
 void Seed::Graphics::Impl::UnloadRenderTarget(const unsigned int & key)
@@ -703,9 +788,14 @@ void Seed::Graphics::Impl::SetTarget(const std::vector<unsigned int>& render_tar
 	for (auto & rt : render_targets)
 		rtvs_.emplace_back(this->render_target_pool_.Get(rt)->GetRTV());
 
-	ID3D11DepthStencilView * dsv = this->depth_stencil_pool_.Get(depth_stencil)->GetDSV();
+	if (depth_stencil == -1)
+		this->device_context_->OMSetRenderTargets(static_cast<unsigned int>(rtvs_.size()), rtvs_.data(), nullptr);
+	else
+	{
+		ID3D11DepthStencilView * dsv = this->depth_stencil_pool_.Get(depth_stencil)->GetDSV();
+		this->device_context_->OMSetRenderTargets(static_cast<unsigned int>(rtvs_.size()), rtvs_.data(), dsv);
+	}
 
-	this->device_context_->OMSetRenderTargets(static_cast<unsigned int>(rtvs_.size()), rtvs_.data(), dsv);
 }
 
 void Seed::Graphics::Impl::SetShader(const unsigned int & shader, void * constant_buffer)
@@ -740,6 +830,14 @@ void Seed::Graphics::Impl::DrawScreen(const std::vector<unsigned int>& render_ta
 		this->device_context_->PSSetShaderResources(n, 1, &srv);
 	}
 
+	this->device_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	this->device_context_->Draw(4, 0);
+}
+
+void Seed::Graphics::Impl::DrawTexture(const unsigned int & texture_id)
+{
+	auto srv = this->texture_pool_.Get(texture_id)->GetSRV();
+	this->device_context_->PSSetShaderResources(0, 1, &srv);
 	this->device_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	this->device_context_->Draw(4, 0);
 }
@@ -793,4 +891,17 @@ void Seed::Graphics::Impl::SetRTSRV(const std::vector<unsigned int>& render_targ
 		this->device_context_->DSSetShaderResources(n, 1, &srv);
 		this->device_context_->PSSetShaderResources(n, 1, &srv);
 	}
+}
+
+void Seed::Graphics::Impl::SetBlend(const bool & blend)
+{
+	if(blend)
+		this->device_context_->OMSetBlendState(this->blend_state_.Get(), nullptr, 0xffffffff);
+	else
+		this->device_context_->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+}
+
+void Seed::Graphics::Impl::SetScreenColor(const DirectX::Vector4 & color)
+{
+	this->model_cb_.screen_ = color;
 }

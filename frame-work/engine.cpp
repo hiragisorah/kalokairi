@@ -1,5 +1,4 @@
 #include "engine.h"
-
 Seed::Engine::Engine(Graphics & graphics)
 	: graphics_(graphics)
 	, current_scene_(nullptr)
@@ -54,12 +53,6 @@ const bool Seed::Engine::ProcessScene(void)
 			this->current_scene_->Update();
 		}
 		this->current_scene_->Always();
-
-		this->current_scene_->Begin(this->graphics_);
-
-		this->current_scene_->Render(this->graphics_);
-
-		this->current_scene_->End(this->graphics_);
 	}
 	else
 	{
@@ -82,6 +75,15 @@ const bool Seed::Engine::ProcessScene(void)
 
 			return false;
 		}
+	}
+
+	if (this->current_scene_)
+	{
+		this->current_scene_->Begin(this->graphics_);
+
+		this->current_scene_->Render(this->graphics_);
+
+		this->current_scene_->End(this->graphics_);
 	}
 
 	return true;

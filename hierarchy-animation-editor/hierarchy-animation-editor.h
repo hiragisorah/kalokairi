@@ -115,8 +115,10 @@ private slots:
 	void actionExport2(void);
 
 private:
+	unsigned int shader_post_effects_;
 	unsigned int shader_backbuffer_;
 	unsigned int shader_deffered_;
+	unsigned int shader_shadow_;
 
 	unsigned int backbuffer_;
 
@@ -124,6 +126,7 @@ private:
 	unsigned int pos_map_;
 	unsigned int nor_map_;
 	unsigned int dep_map_;
+	unsigned int sha_map_;
 
 	unsigned int dsv_;
 	unsigned int vp_;
