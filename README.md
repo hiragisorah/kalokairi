@@ -16,5 +16,5 @@
   
 # 次
 ただのウィンドウアプリじゃアニメーションの制御が難しかったので、  
-次はノードシステムを自作してみる。  
+次はノードシステムを自作してみる。  【ほぼ完成】
 https://github.com/hiragisorah/node_base_tool_project  
