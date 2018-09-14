@@ -35,5 +35,5 @@ https://youtu.be/MrVb0H8SH40
 
 # 次
 ただのウィンドウアプリじゃアニメーションの制御が難しかったので、  
-次はノードシステムを自作してみる。
+次はノードシステムを自作してみる。  
 https://github.com/hiragisorah/node_base_tool_project  
